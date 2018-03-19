@@ -1,4 +1,4 @@
-## Universidade Federal de Goiás
+﻿## Universidade Federal de Goiás
 
 # Projeto 1 do Grupo 2
 
@@ -8,4 +8,6 @@
 **Rafael Ratacheski de Sousa Raulino** - *rafaelratacheski@gmail.com* - Master
 
 **Jordy Aparecido Faria de Araújo** - *jordyfaria0@gmail.com* - Developer
+
+**Tiago Santana de Castro** - *tiagosantanadecastro@gmail.com* - Developer
 
