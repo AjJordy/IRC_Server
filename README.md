@@ -12,3 +12,5 @@
 **Tiago Santana de Castro** - *tiagosantanadecastro@gmail.com* - Developer
 
 **Adílio Vitor de Oliveira Júnior** - *adiliojr31@hotmail.com* - Developer
+
+**Victor Gomide Ferraz** - *victorgomferraz2@gmail.com* - Developer
