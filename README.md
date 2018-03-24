@@ -16,7 +16,7 @@
 **Victor Gomide Ferraz** - *victorgomferraz2@gmail.com* - Developer
 
 
-## Projeto Tetrisnet
+## Projeto Tetrinet
 
 **6 Pessoas jogando Tetris juntos.**
 
