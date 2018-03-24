@@ -14,3 +14,10 @@
 **Adílio Vitor de Oliveira Júnior** - *adiliojr31@hotmail.com* - Developer
 
 **Victor Gomide Ferraz** - *victorgomferraz2@gmail.com* - Developer
+
+
+## Projeto Tetrisnet
+
+**6 Pessoas jogando Tetris juntos.**
+
+**Bate-papo entre os jogadores.**
