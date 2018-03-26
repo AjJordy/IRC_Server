@@ -34,12 +34,6 @@ net.createServer(function (socket) {
     cliente.broadcast.emit("chat", clients[cliente.id], mensagem);
   });
 
-  client.on("disconnect", function(){
-    console.log("Disconectado");
-    io.emit("update", clients[cliente.id] + " abandonou o servidor");
-    delete clients[cliente.id];
-  });
-});
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
     //broadcast(socket.name + "> " + data, socket);
