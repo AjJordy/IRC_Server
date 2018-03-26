@@ -1,5 +1,9 @@
 // Load the TCP Library
-net = require('net');
+ var net = require('net');
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
 
 // Keep track of the chat clients
 var clients = [];
@@ -14,8 +18,8 @@ net.createServer(function (socket) {
   clients.push(socket);
 
   // Send a nice welcome message and announce
-  socket.write("Welcome " + socket.name + "\n");
-  broadcast(socket.name + " joined the chat\n", socket);
+  socket.write("Bem Vindo " + socket.name + "\n");
+  broadcast(socket.name + " entrou no chat\n", socket);
  
   io.on("connection", function (cliente) {
   cliente.on("join", function(nome){
@@ -45,7 +49,7 @@ net.createServer(function (socket) {
   // Remove the client from the list when it leaves
   socket.on('end', function () {
     clients.splice(clients.indexOf(socket), 1);
-    broadcast(socket.name + " left the chat.\n");
+    broadcast(socket.name + " abandonou o chat.\n");
   });
 
   // Send a message to all clients
@@ -85,4 +89,4 @@ net.createServer(function (socket) {
 }).listen(5000);
 
 // Put a friendly message on the terminal of the server.
-console.log("Chat server running at port 5000\n");
+console.log("servidor de chat rodando na porta 5000\n");
