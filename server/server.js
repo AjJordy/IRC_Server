@@ -19,7 +19,7 @@ net.createServer(function (socket) {
 
   // Send a nice welcome message and announce
   socket.write("Welcome " + socket.name + "\n");
-  broadcast(socket.name + " joined the chat\n", socket);
+  handler.broadcast(socket.name + " joined the chat\n", socket, clients);
 
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
@@ -29,7 +29,7 @@ net.createServer(function (socket) {
 		else
 		{
 			console.log(data.toString().trim());
-			broadcast(data.toString().trim(), socket);
+			handler.broadcast(data.toString().trim(), socket, clients);
 		}
 
   });
@@ -37,19 +37,9 @@ net.createServer(function (socket) {
   // Remove the client from the list when it leaves
   socket.on('end', function () {
     clients.splice(clients.indexOf(socket), 1);
-    broadcast(socket.name + " left the chat.\n");
+    handler.broadcast(socket.name + " left the chat.\n", socket, clients);
   });
 
-// Send a message to all clients
-function broadcast(message, sender) {
-  clients.forEach(function (client) {
-    // Don't want to send it to sender
-    if (client === sender) return;
-    client.write(message);
-  });
-  // Log it to the server output too
-  process.stdout.write(message)
-}
 
 }).listen(5000);
 
