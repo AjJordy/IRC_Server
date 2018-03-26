@@ -16,7 +16,26 @@ net.createServer(function (socket) {
   // Send a nice welcome message and announce
   socket.write("Welcome " + socket.name + "\n");
   broadcast(socket.name + " joined the chat\n", socket);
+ 
+  io.on("connection", function (cliente) {
+  cliente.on("join", function(nome){
+    console.log("Entrou: " + nome);
+    clients[cliente.id] = nome;
+    cliente.emit("update", "Você se conectou ao servidor");
+    cliente.broadcast.emit("update", nome + " entrou no servidor")
+  });
 
+  client.on("send", function(mensagem){
+    console.log("Mensagem: " + mensagem);
+    cliente.broadcast.emit("chat", clients[cliente.id], mensagem);
+  });
+
+  client.on("disconnect", function(){
+    console.log("Disconectado");
+    io.emit("update", clients[cliente.id] + " abandonou o servidor");
+    delete clients[cliente.id];
+  });
+});
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
     //broadcast(socket.name + "> " + data, socket);
