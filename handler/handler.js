@@ -21,9 +21,14 @@ exports.analize = function (args) {
 }
 
 function user(args) {
-  //TODO
-  socket.write("USER command executed with sucess.\n");
+    var user = args[1];
+    var hostname = args[2];
+    var servername = args[3];
+    var realname = args[4];
+    broadcast(user + " joined the chat\n", socket);
+    socket.write("USER command executed withªª• sucess.\n");
 }
+
 
 
 function nick(args) {
