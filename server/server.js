@@ -12,7 +12,7 @@ var clients = [];
 net.createServer(function (socket) {
 
   // Identify this client
-  socket.name = socket.remoteAddress + ":" + socket.remotePort
+  socket.name = socket.remoteAddress + ":" + socket.remotePort;
 
   // Put this new client in the list
   clients.push(socket);
