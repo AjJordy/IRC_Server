@@ -9,7 +9,8 @@ clientEntity = require('../entity/entity_client.js');
 
 // Keep track of the chat clients
 var clients = [];
-
+var nicks = [];
+var channels = [];
 // Start a TCP Server
 net.createServer(function (socket) {
 
