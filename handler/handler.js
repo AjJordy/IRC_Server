@@ -14,25 +14,25 @@ exports.broadcast = function (message, sender, clients) {
   process.stdout.write(message);
 }
 
-exports.analize = function (data,socket) {
+exports.analize = function (data, client, clients) {
   var message = String(data).trim();
   var args = message.split(" ");
   if (args[0] == "/HELP") help(socket);
-  else if (args[0] == "/NICK") nick(args,socket);
-  else if (args[0] == "/PASS") pass(args,socket);
-  else if ( args[0] == "/USER") user(args,socket);
-  else if ( args[0] == "/OPER") oper(args,socket);
-  else if ( args[0] == "/MODE") mode(args,socket);
-  else if ( args[0] == "/SERVICE") service(args,socket);
-  else if ( args[0] == "/QUIT") quit(args,socket);
-  else if ( args[0] == "/JOIN") join(args,socket);
-  else if ( args[0] == "/PART") part(args,socket);
-  else if ( args[0] == "/TOPIC") topic(args,socket);
-  else if ( args[0] == "/NAMES") names(args,socket);
-  else if ( args[0] == "/LIST") list(args,socket);
-  else if ( args[0] == "/INVITE") invite(args,socket);
-  else if ( args[0] == "/KICK") kick(args,socket,target);
-  else if ( args[0] == "/PRIVMSG") privmsg(target,args,socket);
+  else if (args[0] == "/NICK") nick(args,client, clients);
+  else if (args[0] == "/PASS") pass(args,client.socket);
+  else if ( args[0] == "/USER") user(args,client.socket);
+  else if ( args[0] == "/OPER") oper(args,client.socket);
+  else if ( args[0] == "/MODE") mode(args,client.socket);
+  else if ( args[0] == "/SERVICE") service(args,client.socket);
+  else if ( args[0] == "/QUIT") quit(args,client.socket);
+  else if ( args[0] == "/JOIN") join(args,client.socket);
+  else if ( args[0] == "/PART") part(args,client.socket);
+  else if ( args[0] == "/TOPIC") topic(args,client.socket);
+  else if ( args[0] == "/NAMES") names(args,client.socket);
+  else if ( args[0] == "/LIST") list(args,client.socket);
+  else if ( args[0] == "/INVITE") invite(args,client.socket);
+  else if ( args[0] == "/KICK") kick(args,client.socket,target);
+  else if ( args[0] == "/PRIVMSG") privmsg(target,args,client.socket);
   else socket.write("Error: Non-existent command.\n");
 }
 
@@ -66,10 +66,10 @@ function help(socket){
 }
 
 // Set the user's nickname
-function nick(args,socket){
+function nick(args,client, clients){
   //TODO Corrigir função, erro ao usar.
   nickname = args[1].toString();
-  handler.broadcast(nickname.toString() + " joined the chat\n", socket);
+  handler.broadcast(nickname.toString() + " joined the chat\n", client.socket);
   socket.write("NICK command executed with sucess.\n");
 }
 
