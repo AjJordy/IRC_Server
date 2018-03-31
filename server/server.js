@@ -4,6 +4,13 @@ net = require('net');
 //Load command handler
 handler = require('../handler/handler.js');
 
+//Load client entity
+clientEntity = require('../model/clientEntity.js');
+
+//Load channel entity
+channelEntity = require('../model/channelEntity.js');
+
+
 
 // Keep track of the chat clients
 var clients = [];
@@ -12,24 +19,28 @@ var clients = [];
 net.createServer(function (socket) {
 
   // Identify this client
-  socket.name = socket.remoteAddress + ":" + socket.remotePort;
+  //socket.name = socket.remoteAddress + ":" + socket.remotePort;
+
+  //Create client object and assign socket and attributes
+	var curr_Client = clientEntity.constructor(socket);
+  curr_Client.nick = "Anonymous";
 
   // Put this new client in the list
-  clients.push(socket);
+  clients.push(curr_Client);
 
   // Send a nice welcome message and announce
   socket.write("Welcome " + socket.name + "\n/HELP to know all commands.\n");
-  handler.broadcast(socket.name + " joined the chat\n", socket,clients);
+  handler.broadcast(socket.name + " joined the chat\n", curr_Client,'clients');
 
   // Handle incoming messages from clients.
-  socket.on('data', function (data) {
+  socket.on('data', function (data,curr_Client,clients) {
     var args = data.toString().trim().split(" ");
 		if(args[0][0] === '/')
-			handler.analize(data,socket);
+			handler.analize(data,curr_Client,clients);
 		else
 		{
 			console.log(data.toString().trim());
-			handler.broadcast(data.toString().trim(), socket, clients);
+			handler.broadcast(data.toString().trim(), curr_Client, clients);
 		}
 
   });
