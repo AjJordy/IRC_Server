@@ -12,20 +12,20 @@ var clients = [];
 net.createServer(function (socket) {
 
   // Identify this client
-  socket.name = socket.remoteAddress + ":" + socket.remotePort
+  socket.name = socket.remoteAddress + ":" + socket.remotePort;
 
   // Put this new client in the list
   clients.push(socket);
 
   // Send a nice welcome message and announce
-  socket.write("Welcome " + socket.name + "\n");
-  handler.broadcast(socket.name + " joined the chat\n", socket, clients);
+  socket.write("Welcome " + socket.name + "\n/HELP to know all commands.\n");
+  handler.broadcast(socket.name + " joined the chat\n", socket,clients);
 
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
     var args = data.toString().trim().split(" ");
 		if(args[0][0] === '/')
-			handler.analize(args);
+			handler.analize(data,socket);
 		else
 		{
 			console.log(data.toString().trim());
