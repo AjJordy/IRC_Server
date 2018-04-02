@@ -16,11 +16,15 @@ exports.broadcast = function (message, sender, clients) {
 
 exports.analize = function (data, client, clients) {
   var message = String(data).trim();
-  var args = message.split(" ");
+
+  //Os args estavam vindo separados por vírgula, e não por espaço
+
+  var args = message.split(",");
+
   if (args[0] == "/HELP") help(socket);
   else if (args[0] == "/NICK") nick(args,client, clients);
   else if (args[0] == "/PASS") pass(args,client.socket);
-  else if ( args[0] == "/USER") user(args,client.socket);
+  else if ( args[0] == "/USER") user(args,client);
   else if ( args[0] == "/OPER") oper(args,client.socket);
   else if ( args[0] == "/MODE") mode(args,client.socket);
   else if ( args[0] == "/SERVICE") service(args,client.socket);
@@ -33,7 +37,7 @@ exports.analize = function (data, client, clients) {
   else if ( args[0] == "/INVITE") invite(args,client.socket);
   else if ( args[0] == "/KICK") kick(args,client.socket,target);
   else if ( args[0] == "/PRIVMSG") privmsg(target,args,client.socket);
-  else socket.write("Error: Non-existent command.\n");
+  else client.socket.write("Error: Non-existent command.\n");
 }
 
 // List all commands available
@@ -61,7 +65,7 @@ function help(socket){
   "/LIST: The list command is used to list channels and their topics.\n"+
   "/INVITE: Is used to invite a user to a channel.\n"+
   "/KICK: Is used to request the forced removal of a user from a channel.\n"+
-  "/PRIVMSG: Is used to send private messages between users.\n"+
+  "/PRIVMSG: Is used to send private messages between users.\n")//+
   //TODO Continua...);
 }
 
@@ -78,9 +82,30 @@ function pass(args,socket) {
   socket.write("PASS command executed with sucess.\n");
 }
 
-function user(args,socket) {
+function user(args,client) {
   //TODO
-  socket.write("USER command executed with sucess.\n");
+
+  console.log("USER COMMAND \n");
+
+  if(args.length < 5)
+  {
+    client.socket.write("Need more params\n\n");
+  }
+  else
+  {
+    client.userName = args[1];
+
+    for(var i = 4 ; i < args.length ; i++)
+    {
+      client.realName += args[i];
+      client.realName += " ";
+    }
+
+    client.realName = client.realName.trim();
+
+  }
+
+  client.socket.write("USER command executed with sucess.\n");
 }
 
 function oper(args,socket){

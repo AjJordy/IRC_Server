@@ -13,5 +13,11 @@
 	objClient.quitMessage = null;
 	objClient.isRegistered = false;
 
+        // Editado por Adilio
+        // Adiconar os campos username e realname para utilizar no comando USER
+
+        objClient.userName = null;
+        objClient.realName = "";
+
  	return objClient;
 }
