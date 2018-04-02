@@ -85,8 +85,6 @@ function pass(args,socket) {
 function user(args,client) {
   //TODO
 
-  console.log("USER COMMAND \n");
-
   if(args.length < 5)
   {
     client.socket.write("Need more params\n\n");
@@ -103,9 +101,8 @@ function user(args,client) {
 
     client.realName = client.realName.trim();
 
+    client.socket.write("USER command executed with sucess.\n");
   }
-
-  client.socket.write("USER command executed with sucess.\n");
 }
 
 function oper(args,socket){

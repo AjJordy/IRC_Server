@@ -33,8 +33,6 @@ net.createServer(function (socket) {
 			handler.broadcast(data.toString().trim(), client.socket, clients);
 		}
 
-                console.log(client.userName + "\n" + client.realName + "\n\n");
-
   });
 
   // Remove the client from the list when it leaves
