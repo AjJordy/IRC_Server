@@ -14,4 +14,4 @@
 	objClient.isRegistered = false;
 
  	return objClient;
-}
+};

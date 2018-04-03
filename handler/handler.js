@@ -23,15 +23,15 @@ exports.analyze = function (data, client, clients) {
   else if ( args[0] == "INVITE") invite(args,client.socket);
   else if ( args[0] == "KICK") kick(args,client.socket,target);
   else if ( args[0] == "PRIVMSG") privmsg(args, client, clients);
-  else broadcast(data.toString().trim(), client.socket, clients);;
-}
+  else broadcast(data.toString().trim(), client.socket, clients);
+};
 
 // Send a message to all clients
 function broadcast(message, sender, clients, channel) {
   clients.forEach(function (client) {
     // Don't want to send it to sender
     if (client === sender) return;
-    client.write(nickname+": "+message+"\n");
+    client.socket.write(nickname+": "+message+"\n");
   });
   // Log it to the server output too
   process.stdout.write(message);
@@ -180,19 +180,19 @@ function kick(){
 }
 
 function privmsg(args, client, clients) {
-    var socket = client.socket;
-    if (!args[1] || !args[2]) {
-        socket.write("Incomplete Command");
-    } else if (args[2].charAt(0) !== ':') {
-        socket.write("Messages should start with character':'");
-    } else {
-        clients.forEach(function (client1) {
-            if (client1.nick === args[1]) {
-              args.splice(0, 2);
-                var text = args.join(" ");
-                client1.socket.write("Private message from" + client.nick + " " + text + "\n");
-            }
-        });
-    }
+  var socket = client.socket;
+  if (!args[1] || !args[2]) {
+    socket.write("Incomplete Command");
+  } else if (args[2].charAt(0) !== ':') {
+    socket.write("Messages should start with character':'");
+  } else {
+    clients.forEach(function (client1) {
+      if (client1.nick === args[1]) {
+        args = args.splice(2);
+        var text = args.join(" ").replace(':', '');
+        client1.socket.write("Private message from " + client.nick + " " + text + "\n");
+      }
+    });
+  }
 }
- exports.broadcast = broadcast;
+exports.broadcast = broadcast;

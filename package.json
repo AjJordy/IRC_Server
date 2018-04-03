@@ -1,0 +1,22 @@
+{
+  "name": "p1-g1",
+  "version": "1.0.0",
+  "description": "**Rafael Ratacheski de Sousa Raulino** - *rafaelratacheski@gmail.com* - Master",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/sd1-ec-2018-1/p1-g1.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/sd1-ec-2018-1/p1-g1/issues"
+  },
+  "homepage": "https://gitlab.com/sd1-ec-2018-1/p1-g1#README",
+  "devDependencies": {
+    "jasmine": "^3.1.0"
+  }
+}
