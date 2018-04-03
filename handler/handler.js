@@ -1,44 +1,45 @@
 // Load the TCP Library
 net = require('net');
-
 server = require('../server/server.js');
 
-// // Send a message to all clients
-// exports.broadcast = function (message, curr_Client, clients) {
-//   clients.forEach(function (client) {
-//     // Don't want to send it to sender
-//     if (client === curr_Client) return;
-//     client.write(curr_Client.nick+": "+message+"\n");
-//   });
-//   // Log it to the server output too
-//   process.stdout.write(message);
-// }
+var nickname = "Anonymous";
 
-exports.analize = function (data,curr_Client,clients) {
+exports.analyze = function (data, client, clients) {
   var message = String(data).trim();
   var args = message.split(" ");
-  if (args[0] == "HELP") help(curr_Client);
-  else if (args[0] == "NICK") nick(args,curr_Client);
-  else if (args[0] == "PASS") pass(args,socket);
-  else if ( args[0] == "USER") user(args,socket);
-  else if ( args[0] == "OPER") oper(args,socket);
-  else if ( args[0] == "MODE") mode(args,socket);
-  else if ( args[0] == "SERVICE") service(args,socket);
-  else if ( args[0] == "QUIT") quit(socket,clients);
-  else if ( args[0] == "JOIN") join(args,socket);
-  else if ( args[0] == "PART") part(args,socket);
-  else if ( args[0] == "TOPIC") topic(args,socket);
-  else if ( args[0] == "NAMES") names(args,socket);
-  else if ( args[0] == "LIST") list(args,socket);
-  else if ( args[0] == "INVITE") invite(args,socket);
-  else if ( args[0] == "KICK") kick(args,socket,target);
-  else if ( args[0] == "PRIVMSG") privmsg(target,args,socket);
-  else return true;//socket.write("Error: Non-existent command.\n");
+  if (args[0] == "HELP") help(socket);
+  else if (args[0] == "NICK") nick(args,client, clients);
+  else if (args[0] == "PASS") pass(args,client.socket);
+  else if ( args[0] == "USER") user(args,client.socket);
+  else if ( args[0] == "OPER") oper(args,client.socket);
+  else if ( args[0] == "MODE") mode(args,client.socket);
+  else if ( args[0] == "SERVICE") service(args,client.socket);
+  else if ( args[0] == "QUIT") quit(args,client.socket);
+  else if ( args[0] == "JOIN") join(args,client.socket);
+  else if ( args[0] == "PART") part(args,client.socket);
+  else if ( args[0] == "TOPIC") topic(args,client.socket);
+  else if ( args[0] == "NAMES") names(args,client.socket);
+  else if ( args[0] == "LIST") list(args,client.socket);
+  else if ( args[0] == "INVITE") invite(args,client.socket);
+  else if ( args[0] == "KICK") kick(args,client.socket,target);
+  else if ( args[0] == "PRIVMSG") privmsg(args, client, clients);
+  else broadcast(data.toString().trim(), client.socket, clients);
+};
+
+// Send a message to all clients
+function broadcast(message, sender, clients, channel) {
+  clients.forEach(function (client) {
+    // Don't want to send it to sender
+    if (client === sender) return;
+    client.socket.write(nickname+": "+message+"\n");
+  });
+  // Log it to the server output too
+  process.stdout.write(message);
 }
 
 // List all commands available
-function help(curr_Client){
-  curr_Client.socket.write("\nCommands of connection registration:\n\n"+
+function help(socket){
+  socket.write("\nCommands of connection registration:\n"+
   "NICK: To set your nickname.\n"+
   "PASS: To set your password.\n"+
   "USER: used at the beginning of connection to specify the username.\n"+
@@ -67,19 +68,11 @@ function help(curr_Client){
 }
 
 // Set the user's nickname
-function nick(args,curr_Client){
+function nick(args,client, clients){
   //TODO Corrigir função, erro ao usar.
-  curr_Client.nick = String(args[1]).toString();
-  handler.broadcast(curr_Client.nick + " joined the chat\n", socket);
-  curr_Client.socket.write("NICK command executed with sucess.\n");
-}
-
-
-function quit(args,curr_Client,clients) {
-  //TODO
-  socket.write("QUIT command executed with sucess.\n");
-  //clients.splice(clients.indexOf(socket), 1);
-  curr_Client.quitMessage = String(args[1]).toString();
+  nickname = args[1].toString();
+  broadcast(nickname.toString() + " joined the chat\n", client.socket);
+  socket.write("NICK command executed with sucess.\n");
 }
 
 function pass(args,socket) {
@@ -107,10 +100,54 @@ function service(args,socket){
   socket.write("JOIN command executed with sucess.\n");
 }
 
-function join(args,socket) {
-  //TODO
-  socket.write("JOIN command executed with sucess.\n");
+function quit(args, client, clients) {
+  var socket = client.socket;
+  if(!args[1]){
+    // Remove usuario sem mostrar nenhuma mensagem
+    if(broadcast(client.nick + " quits\n", client));
+    socket.end();
+    remove(client);
+  } else {
+    // Remove usuario exibindo mensagem escrita por ele
+    args.splice(0, 1);
+    var mesg = args.join(" ");
+    broadcast(client.nick + " quits: " + mesg + "\n", client, clients, canal=client.channels);
+    socket.end();
+    remove(client);
+  }
 }
+
+function remove(client) {
+  delete server.nicks[client.nick];
+  var index = server.clients.indexOf(client);
+  server.clients.splice(index, 1);
+}
+
+
+
+function join(args, client, clients, nicks, channels){
+  var socket = client.socket;
+
+  if(!args[1]){
+    socket.write("ERROR: invalid request, try /join <#channel>\n");
+    return;
+  }
+  else{
+    var channelName = args.slice(1);
+
+    for(i = 0; i < channels.length; i++){
+      //checa se o canal existe
+      if(channels[i].name == channelName){
+        var chn = channels[i];
+        client.channels.push(chn);
+        channels[i].clients.push(client);
+        server.channels=channels;
+        client.socket.write("You joined " + chn.name + ".\n");
+      }
+    }
+  }
+}
+
 
 function part(args, socket){
   //TODO
@@ -142,7 +179,20 @@ function kick(){
   socket.write("KICK command executed with sucess.\n");
 }
 
-function privmsg(){
-  //TODO
-  socket.write("PRIVMSG command executed with sucess.\n");
+function privmsg(args, client, clients) {
+  var socket = client.socket;
+  if (!args[1] || !args[2]) {
+    socket.write("Incomplete Command");
+  } else if (args[2].charAt(0) !== ':') {
+    socket.write("Messages should start with character':'");
+  } else {
+    clients.forEach(function (client1) {
+      if (client1.nick === args[1]) {
+        args = args.splice(2);
+        var text = args.join(" ").replace(':', '');
+        client1.socket.write("Private message from " + client.nick + " " + text + "\n");
+      }
+    });
+  }
 }
+exports.broadcast = broadcast;
