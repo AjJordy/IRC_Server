@@ -26,15 +26,9 @@ net.createServer(function (socket) {
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
     var args = data.toString().trim().split(" ");
-		if(args[0][0] === '/')
-			handler.analize(args, client, clients);
-		else
-		{
-			console.log(data.toString().trim());
-			handler.broadcast(data.toString().trim(), client.socket, clients);
-		}
-
-  });
+		handler.analyze(args, client, clients);
+		console.log(data.toString().trim());
+	});
 
   // Remove the client from the list when it leaves
   socket.on('end', function () {
