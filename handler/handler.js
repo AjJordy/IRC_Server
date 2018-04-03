@@ -22,7 +22,7 @@ exports.analyze = function (data, client, clients) {
   else if ( args[0] == "LIST") list(args,client.socket);
   else if ( args[0] == "INVITE") invite(args,client.socket);
   else if ( args[0] == "KICK") kick(args,client.socket,target);
-  else if ( args[0] == "PRIVMSG") privmsg(args, client.socket, clients);
+  else if ( args[0] == "PRIVMSG") privmsg(args, client, clients);
   else broadcast(data.toString().trim(), client.socket, clients);;
 }
 
@@ -179,14 +179,15 @@ function kick(){
   socket.write("KICK command executed with sucess.\n");
 }
 
-function privmsg(args, socket, clients) {
+function privmsg(args, client, clients) {
+    var socket = client.socket;
     if (!args[1] || !args[2]) {
         socket.write("Incomplete Command");
-    } else if (args[2].charAt(0) != ':') {
+    } else if (args[2].charAt(0) !== ':') {
         socket.write("Messages should start with character':'");
     } else {
         clients.forEach(function (client1) {
-            if (client1.nick == args[1]) {
+            if (client1.nick === args[1]) {
               args.splice(0, 2);
                 var text = args.join(" ");
                 client1.socket.write("Private message from" + client.nick + " " + text + "\n");
