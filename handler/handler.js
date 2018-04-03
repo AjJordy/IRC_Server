@@ -1,10 +1,12 @@
 // Load the TCP Library
 net = require('net');
+server = require('../server/server.js');
+
 
 var nickname = "Anonymous";
 
 // Send a message to all clients
-exports.broadcast = function (message, sender, clients) {
+exports.broadcast = function (message, sender, clients, channel) {
   clients.forEach(function (client) {
     // Don't want to send it to sender
     if (client === sender) return;
@@ -98,15 +100,54 @@ function service(args,socket){
   socket.write("JOIN command executed with sucess.\n");
 }
 
-function quit(socket) {
-  //TODO
-  socket.write("QUIT command executed with sucess.\n");
+function quit(args, client, clients) {
+  var socket = client.socket;
+  if(!args[1]){
+    // Remove usuario sem mostrar nenhuma mensagem
+    if(broadcast(client.nick + " quits\n", client));
+    socket.end();
+    remove(client);
+  } else {
+    // Remove usuario exibindo mensagem escrita por ele
+    args.splice(0, 1);
+    var mesg = args.join(" ");
+    broadcast(client.nick + " quits: " + mesg + "\n", client, clients, canal=client.channels);
+    socket.end();
+    remove(client);
+  }
 }
 
-function join(args,socket) {
-  //TODO
-  socket.write("JOIN command executed with sucess.\n");
+function remove(client) {
+  delete server.nicks[client.nick];
+  var index = server.clients.indexOf(client);
+  server.clients.splice(index, 1);
 }
+
+
+
+function join(args, client, clients, nicks, channels){
+  var socket = client.socket;
+
+  if(!args[1]){
+    socket.write("ERROR: invalid request, try /join <#channel>\n");
+    return;
+  }
+  else{
+    var channelName = args.slice(1);
+
+    for(i = 0; i < channels.length; i++){
+      //checa se o canal existe
+      if(channels[i].name == channelName){
+        var chn = channels[i];
+        client.channels.push(chn);
+        channels[i].clients.push(client);
+        server.channels=channels;
+        client.socket.write("You joined " + chn.name + ".\n");
+      }
+    }
+  }
+}
+
 
 function part(args, socket){
   //TODO
