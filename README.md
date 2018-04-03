@@ -16,8 +16,8 @@
 **Victor Gomide Ferraz** - *victorgomferraz2@gmail.com* - Developer
 
 
-## Projeto Tetrinet
+## Projeto Servidor IRC
 
-**6 Pessoas jogando Tetris juntos.**
+**Implementando um servidor de chat pautado sobre o protocolo IRC.**
 
-**Bate-papo entre os jogadores.**
+**Bate-papo entre usuarios em diversos canais.**
