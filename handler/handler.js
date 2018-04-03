@@ -62,8 +62,9 @@ function help(socket){
   "LIST: The list command is used to list channels and their topics.\n"+
   "INVITE: Is used to invite a user to a channel.\n"+
   "KICK: Is used to request the forced removal of a user from a channel.\n"+
-  "PRIVMSG: Is used to send private messages between users.\n"+
-  //TODO Continua...);
+  "PRIVMSG: Is used to send private messages between users.\n"
+  //TODO Continua...
+  );
 }
 
 // Set the user's nickname
