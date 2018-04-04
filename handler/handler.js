@@ -1,6 +1,3 @@
-// Load the TCP Library
-net = require('net');
-
 var nickname = "Anonymous";
 
 // Send a message to all clients
