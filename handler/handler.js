@@ -6,7 +6,7 @@ var nickname = "Anonymous";
 
 exports.analyze = function (data, client, clients) {
   var message = String(data).trim();
-  var args = message.split(" ");
+  var args = message.split(",");
   if (args[0] == "HELP") help(socket);
   else if (args[0] == "NICK") nick(args,client, clients);
   else if (args[0] == "PASS") pass(args,client.socket);
@@ -23,18 +23,18 @@ exports.analyze = function (data, client, clients) {
   else if ( args[0] == "INVITE") invite(args,client.socket);
   else if ( args[0] == "KICK") kick(args,client.socket,target);
   else if ( args[0] == "PRIVMSG") privmsg(args, client, clients);
-  else broadcast(data.toString().trim(), client.socket, clients);
+  else broadcast(data.toString().trim(), client, clients);
 };
 
 // Send a message to all clients
-function broadcast(message, sender, clients, channel) {
+function broadcast(message, sender, clients) {
   clients.forEach(function (client) {
     // Don't want to send it to sender
     if (client === sender) return;
-    client.socket.write(nickname+": "+message+"\n");
+    client.socket.write(sender.nick+": "+message+"\n");
   });
   // Log it to the server output too
-  process.stdout.write(message);
+  process.stdout.write(sender.nick+": "+message+"\n");
 }
 
 // List all commands available
@@ -70,9 +70,16 @@ function help(socket){
 // Set the user's nickname
 function nick(args,client, clients){
   //TODO Corrigir função, erro ao usar.
-  nickname = args[1].toString();
-  broadcast(nickname.toString() + " joined the chat\n", client.socket);
-  socket.write("NICK command executed with sucess.\n");
+  if(args.length < 2)
+  {
+    client.socket.write("Need more params\n\n");
+  }
+  else
+  {
+    client.nick = args[1].toString();
+    broadcast(client.nick.toString() + " joined the chat\n", client, clients);
+    client.socket.write("NICK command executed with sucess.\n");
+  }
 }
 
 function pass(args,socket) {
@@ -111,7 +118,7 @@ function quit(args, client, clients) {
     // Remove usuario exibindo mensagem escrita por ele
     args.splice(0, 1);
     var mesg = args.join(" ");
-    broadcast(client.nick + " quits: " + mesg + "\n", client, clients, canal=client.channels);
+    broadcast(client.nick + " quits: " + mesg + "\n", client, clients);
     socket.end();
     remove(client);
   }
