@@ -2,7 +2,7 @@
  	var objClient = new Object();
  	objClient.socket = socket;
  	objClient.away = false;
- 	objClient.nick = null;
+ 	objClient.nick = "Anonymous";
  	objClient.awayMessage = "";
  	objClient.channels = [];
  	objClient.isOp = false;

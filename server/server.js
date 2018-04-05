@@ -16,11 +16,11 @@ net.createServer(function (socket) {
   var client = clientEntity.constructor(socket);
 
   //Push new client into the list
-  clients.push[client];
+  clients.push(client);
 
   // Send a nice welcome message and announce
-  socket.write("Welcome " + socket.name + "\n/HELP to know all commands.\n");
-  handler.broadcast(socket.name + " joined the chat\n", client.socket,clients);
+  client.socket.write("Welcome " + client.nick + "\n/HELP to know all commands.\n");
+  handler.broadcast(client.nick + " joined the chat\n", client,clients);
 
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
@@ -29,16 +29,15 @@ net.createServer(function (socket) {
 			handler.analize(args, client, clients);
 		else
 		{
-			console.log(data.toString().trim());
-			handler.broadcast(data.toString().trim(), client.socket, clients);
+			handler.broadcast(data.toString().trim(), client, clients);
 		}
-
+    
   });
 
   // Remove the client from the list when it leaves
   socket.on('end', function () {
     clients.splice(clients.indexOf(client.socket), 1);
-    handler.broadcast(socket.name + " left the chat.\n", client.socket, clients);
+    handler.broadcast(client.nick + " left the chat.\n", client, clients);
   });
 
 }).listen(5000);

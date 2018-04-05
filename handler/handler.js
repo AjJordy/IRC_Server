@@ -1,14 +1,13 @@
-var nickname = "Anonymous";
-
 // Send a message to all clients
 exports.broadcast = function (message, sender, clients) {
   clients.forEach(function (client) {
     // Don't want to send it to sender
-    if (client === sender) return;
-    client.write(nickname+": "+message+"\n");
+   if (client === sender) return;
+    client.socket.write(sender.nick+": "+message+"\n");
   });
   // Log it to the server output too
-  process.stdout.write(message);
+  
+  process.stdout.write(message+"\n");
 }
 
 exports.analize = function (data, client, clients) {
@@ -69,9 +68,16 @@ function help(socket){
 // Set the user's nickname
 function nick(args,client, clients){
   //TODO Corrigir função, erro ao usar.
-  nickname = args[1].toString();
-  handler.broadcast(nickname.toString() + " joined the chat\n", client.socket);
-  socket.write("NICK command executed with sucess.\n");
+  if(args.length < 2)
+  {
+    client.socket.write("Need more params\n\n");
+  }
+  else
+  {
+    client.nick = args[1].toString();
+    handler.broadcast(client.nick.toString() + " joined the chat\n", client, clients);
+    client.socket.write("NICK command executed with sucess.\n");
+  }
 }
 
 function pass(args,socket) {
