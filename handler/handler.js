@@ -213,25 +213,6 @@ function join(args, client, clients, nicks, channels) {
     }
 }
 
-function privmsg(args, client, clients) {
-  var socket = client.socket;
-  if (!args[1] || !args[2]) {
-    socket.write("Incomplete Command");
-  } else if (args[2].charAt(0) !== ':') {
-    socket.write("Messages should start with character':'");
-  } else {
-    clients.forEach(function (client1) {
-      if (client1.nick === args[1]) {
-        args = args.splice(2);
-        var text = args.join(" ").replace(':', '');
-        client1.socket.write("Private message from " + client.nick + " " + text + "\n");
-      }
-    });
-  }
-}
-
-
-
 function part(args, socket) {
     //TODO
     socket.write("PART command executed with sucess.\n");
