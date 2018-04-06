@@ -79,11 +79,11 @@ function help(socket){
   "SQUIT: Parameters: <server> <comment>. The SQUIT command is available only to operators. It is used to disconnect server links. \n"+
   "\nCommands of Channel operations:\n\n"+
   "JOIN: Parameters: ( <channel> *( \",\" <channel> ) [ <key> *( \",\" <key> ) ] ) / \"0\" To enter in a channel.\n"+
-  "PART:  Parameters: <channel> *( "," <channel> ) [ <Part Message> ]. Causes the user sending the message to be removed from the list of active members\n"+
-  "MODE: Parameters: <channel> *( ( "-" / "+" ) *<modes> *<modeparams> ). The MODE command is provided so that users may query and change the characteristics of a channel.\n"+
+  "PART:  Parameters: <channel> *( \",\" <channel> ) [ <Part Message> ]. Causes the user sending the message to be removed from the list of active members\n"+
+  "MODE: Parameters: <channel> *( ( \"-\" / \"+\" ) *<modes> *<modeparams> ). The MODE command is provided so that users may query and change the characteristics of a channel.\n"+
   "TOPIC: Parameters: <channel> [ <topic> ]. This is used to change or view the topic of a channel.\n"+
-  "NAMES: Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]. A user can list all nicknames that are visible to him.\n"+
-  "LIST: Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]. The list command is used to list channels and their topics.\n"+
+  "NAMES: Parameters: [ <channel> \*( \",\" <channel> ) [ <target> ] ]. A user can list all nicknames that are visible to him.\n"+
+  "LIST: Parameters: [ <channel> *( \",\" <channel> ) [ <target> ] ]. The list command is used to list channels and their topics.\n"+
   "INVITE: Parameters: <nickname> <channel>. This is used to invite a user to a channel.\n"+
   "KICK: Parameters: <channel> *( \",\" <channel> ) <user> *( \",\" <user> ) [<comment>]. This is used to request the forced removal of a user from a channel.\n"+
   "PRIVMSG: Parameters: <msgtarget> <text to be sent>. This is used to send private messages between users.\n"+
@@ -101,9 +101,9 @@ function help(socket){
   "INFO: Parameters: [ <target> ]. The INFO command is REQUIRED to return information describing the server: its version, when it was compiled, the patchlevel, when it was started, and any other miscellaneous information which may be considered to be relevant.\n"+
   "SERVLIST:  Parameters: [ <mask> [ <type> ] ]. The SERVLIST command is used to list services currently connected to the network and visible to the user issuing the command.\n"+
   "SQUERY: Parameters: <servicename> <text> The SQUERY command is used similarly to PRIVMSG. The only difference is that the recipient MUST be a service. This is the only way for a text message to be delivered to a service.\n"+
-  "WHO: Parameters: [ <mask> [ "o" ] ]. The WHO command is used by a client to generate a query which returns a list of information which ’matches’ the <mask> parameter given by the client.\n"+
-  "WHOIS: Parameters: [ <target> ] <mask> *( "," <mask> ) This command is used to query information about particular user.\n"+
-  "WHOWAS: Parameters: <nickname> *( "," <nickname> ) [ <count> [ <target> ] ]. Whowas asks for information about a nickname which no longer exists.\n"+
+  "WHO: Parameters: [ <mask> [ \"o\" ] ]. The WHO command is used by a client to generate a query which returns a list of information which ’matches’ the <mask> parameter given by the client.\n"+
+  "WHOIS: Parameters: [ <target> ] <mask> *( \",\" <mask> ) This command is used to query information about particular user.\n"+
+  "WHOWAS: Parameters: <nickname> *( \",\" <nickname> ) [ <count> [ <target> ] ]. Whowas asks for information about a nickname which no longer exists.\n"+
   "KILL: Parameters: <nickname> <comment> The KILL command is used to cause a client-server connection to be closed by the server which has the actual connection.\n"+
   "PING : Parameters: <server1> [ <server2> ] The PING command is used to test the presence of an active client or server at the other end of the connection. \n"+
   //"PONG: Parameters: <server> [ <server2> ] PONG message is a reply to ping message.\n"+
