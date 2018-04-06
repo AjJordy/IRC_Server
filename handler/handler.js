@@ -2,6 +2,21 @@
 net = require('net');
 server = require('../server/server.js');
 
+// Send a message to all clients
+exports.broadcast = function(message, sender, clients) {
+  try {
+    clients.forEach(function (client) {
+    // Don't want to send it to sender
+    if (client === sender) return;
+        client.socket.write(sender.nick+": "+message+"\n");
+        // Log it to the server output too
+        process.stdout.write(sender.nick+": "+message+"\n");
+    });
+  } catch (e){
+        console.log(e.getMessage(), e);
+  }
+
+}
 
 const COMMANDS = {
     HELP: 'HELP',
@@ -44,25 +59,11 @@ exports.analyze = function (data, client, clients) {
   else if (args[0] === COMMANDS.INVITE) invite(args, client.socket);
   else if (args[0] === COMMANDS.KICK) kick(args, client.socket, target);
   else if (args[0] === COMMANDS.PRIVMSG) privmsg(args, client, clients, channels);
-  else broadcast(data.toString().trim(), client, clients);
+  else handler.broadcast(data.toString().trim(), client, clients);
 
 };
 
-// Send a message to all clients
-function broadcast(message, sender, clients) {
-  try {
-    clients.forEach(function (client) {
-    // Don't want to send it to sender
-    if (client === sender) return;
-        client.socket.write(sender.nick+": "+message+"\n");
-        // Log it to the server output too
-        process.stdout.write(sender.nick+": "+message+"\n");
-    });
-  } catch (e){
-        console.log(e.getMessage(), e);
-  }
 
-}
 
 // List all commands available
 function help(socket){
@@ -169,14 +170,14 @@ function quit(args, client, clients) {
   var socket = client.socket;
   if(!args[1]){
     // Remove usuario sem mostrar nenhuma mensagem
-    if(broadcast(client.nick + " quits\n", client));
+    if(handler.broadcast(client.nick + " quits\n", client));
     socket.end();
     remove(client);
   } else {
     // Remove usuario exibindo mensagem escrita por ele
     args.splice(0, 1);
     var mesg = args.join(" ");
-    broadcast(client.nick + " quits: " + mesg + "\n", client, clients);
+    handler.broadcast(client.nick + " quits: " + mesg + "\n", client, clients);
     socket.end();
     remove(client);
   }
@@ -292,4 +293,3 @@ function privmsg(args, client, clients, channels) {
         }
     });
 }
-exports.broadcast = broadcast;
