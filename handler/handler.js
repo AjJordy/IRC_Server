@@ -28,23 +28,24 @@ var nickname = "Anonymous";
 exports.analyze = function (data, client, clients) {
   var message = String(data).trim();
   var args = message.split(",");
-  if (args[0] == "HELP") help(socket);
-  else if (args[0] == "NICK") nick(args,client, clients);
-  else if (args[0] == "PASS") pass(args,client.socket);
-  else if ( args[0] == "USER") user(args,client.socket);
-  else if ( args[0] == "OPER") oper(args,client.socket);
-  else if ( args[0] == "MODE") mode(args,client.socket);
-  else if ( args[0] == "SERVICE") service(args,client.socket);
-  else if ( args[0] == "QUIT") quit(args,client.socket);
-  else if ( args[0] == "JOIN") join(args,client.socket);
-  else if ( args[0] == "PART") part(args,client.socket);
-  else if ( args[0] == "TOPIC") topic(args,client.socket);
-  else if ( args[0] == "NAMES") names(args,client.socket);
-  else if ( args[0] == "LIST") list(args,client.socket);
-  else if ( args[0] == "INVITE") invite(args,client.socket);
-  else if ( args[0] == "KICK") kick(args,client.socket,target);
-  else if ( args[0] == "PRIVMSG") privmsg(args, client, clients);
-  else broadcast(data.toString().trim(), client, clients);
+  if (args[0] === COMMANDS.HELP) help(socket);
+  else if (args[0] === COMMANDS.NICK) nick(args, client, clients);
+  else if (args[0] === COMMANDS.PASS) pass(args, client.socket);
+  else if (args[0] === COMMANDS.USER) user(args, client.socket);
+  else if (args[0] === COMMANDS.OPER) oper(args, client.socket);
+  else if (args[0] === COMMANDS.MODE) mode(args, client.socket);
+  else if (args[0] === COMMANDS.SERVICE) service(args, client.socket);
+  else if (args[0] === COMMANDS.QUIT) quit(args, client.socket);
+  else if (args[0] === COMMANDS.JOIN) join(args, client.socket);
+  else if (args[0] === COMMANDS.PART) part(args, client.socket);
+  else if (args[0] === COMMANDS.TOPIC) topic(args, client.socket);
+  else if (args[0] === COMMANDS.NAMES) names(args, client.socket);
+  else if (args[0] === COMMANDS.LIST) list(args, client.socket);
+  else if (args[0] === COMMANDS.INVITE) invite(args, client.socket);
+  else if (args[0] === COMMANDS.KICK) kick(args, client.socket, target);
+  else if (args[0] === COMMANDS.PRIVMSG) privmsg(args, client, clients, channels);
+  else broadcast(data.toString().trim(), client.socket, clients);
+
 };
 
 // Send a message to all clients
