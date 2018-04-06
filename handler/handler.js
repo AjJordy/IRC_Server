@@ -2,6 +2,23 @@
 net = require('net');
 server = require('../server/server.js');
 
+passOp = "admin";
+
+// Send a message to all clients
+exports.broadcast = function(message, sender, clients) {
+  try {
+    clients.forEach(function (client) {
+    // Don't want to send it to sender
+    if (client === sender) return;
+        client.socket.write(sender.nick+": "+message+"\n");
+        // Log it to the server output too
+        process.stdout.write(sender.nick+": "+message+"\n");
+    });
+  } catch (e){
+        console.log("erro", e);
+  }
+
+}
 
 const COMMANDS = {
     HELP: 'HELP',
@@ -28,35 +45,27 @@ var nickname = "Anonymous";
 exports.analyze = function (data, client, clients) {
   var message = String(data).trim();
   var args = message.split(",");
-  if (args[0] == "HELP") help(socket);
-  else if (args[0] == "NICK") nick(args,client, clients);
-  else if (args[0] == "PASS") pass(args,client.socket);
-  else if ( args[0] == "USER") user(args,client.socket);
-  else if ( args[0] == "OPER") oper(args,client.socket);
-  else if ( args[0] == "MODE") mode(args,client.socket);
-  else if ( args[0] == "SERVICE") service(args,client.socket);
-  else if ( args[0] == "QUIT") quit(args,client.socket);
-  else if ( args[0] == "JOIN") join(args,client.socket);
-  else if ( args[0] == "PART") part(args,client.socket);
-  else if ( args[0] == "TOPIC") topic(args,client.socket);
-  else if ( args[0] == "NAMES") names(args,client.socket);
-  else if ( args[0] == "LIST") list(args,client.socket);
-  else if ( args[0] == "INVITE") invite(args,client.socket);
-  else if ( args[0] == "KICK") kick(args,client.socket,target);
-  else if ( args[0] == "PRIVMSG") privmsg(args, client, clients);
-  else broadcast(data.toString().trim(), client, clients);
+  if (args[0] === COMMANDS.HELP) help(socket);
+  else if (args[0] === COMMANDS.NICK) nick(args, client, clients);
+  else if (args[0] === COMMANDS.PASS) pass(args, client.socket);
+  else if (args[0] === COMMANDS.USER) user(args, client.socket);
+  else if (args[0] === COMMANDS.OPER) oper(args, client.socket);
+  else if (args[0] === COMMANDS.MODE) mode(args, client.socket);
+  else if (args[0] === COMMANDS.SERVICE) service(args, client.socket);
+  else if (args[0] === COMMANDS.QUIT) quit(args, client.socket);
+  else if (args[0] === COMMANDS.JOIN) join(args, client.socket);
+  else if (args[0] === COMMANDS.PART) part(args, client.socket);
+  else if (args[0] === COMMANDS.TOPIC) topic(args, client.socket);
+  else if (args[0] === COMMANDS.NAMES) names(args, client.socket);
+  else if (args[0] === COMMANDS.LIST) list(args, client.socket);
+  else if (args[0] === COMMANDS.INVITE) invite(args, client.socket);
+  else if (args[0] === COMMANDS.KICK) kick(args, client.socket, target);
+  else if (args[0] === COMMANDS.PRIVMSG) privmsg(args, client, clients, channels);
+  else handler.broadcast(data.toString().trim(), client, clients);
+
 };
 
-// Send a message to all clients
-function broadcast(message, sender, clients) {
-  clients.forEach(function (client) {
-    // Don't want to send it to sender
-    if (client === sender) return;
-    client.socket.write(sender.nick+": "+message+"\n");
-  });
-  // Log it to the server output too
-  process.stdout.write(sender.nick+": "+message+"\n");
-}
+
 
 // List all commands available
 function help(socket){
@@ -78,11 +87,10 @@ function help(socket){
   "SQUIT: Parameters: <server> <comment>. The SQUIT command is available only to operators. It is used to disconnect server links. \n"+
   "\nCommands of Channel operations:\n\n"+
   "JOIN: Parameters: ( <channel> *( \",\" <channel> ) [ <key> *( \",\" <key> ) ] ) / \"0\" To enter in a channel.\n"+
-  "PART:  Parameters: <channel> *( "," <channel> ) [ <Part Message> ]. Causes the user sending the message to be removed from the list of active members\n"+
-  "MODE: Parameters: <channel> *( ( "-" / "+" ) *<modes> *<modeparams> ). The MODE command is provided so that users may query and change the characteristics of a channel.\n"+
+  "PART:  Parameters: <channel> *( \",\" <channel> ) [ <Part Message> ]. Causes the user sending the message to be removed from the list of active members\n"+
   "TOPIC: Parameters: <channel> [ <topic> ]. This is used to change or view the topic of a channel.\n"+
-  "NAMES: Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]. A user can list all nicknames that are visible to him.\n"+
-  "LIST: Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]. The list command is used to list channels and their topics.\n"+
+  "NAMES: Parameters: [ <channel> \*( \",\" <channel> ) [ <target> ] ]. A user can list all nicknames that are visible to him.\n"+
+  "LIST: Parameters: [ <channel> *( \",\" <channel> ) [ <target> ] ]. The list command is used to list channels and their topics.\n"+
   "INVITE: Parameters: <nickname> <channel>. This is used to invite a user to a channel.\n"+
   "KICK: Parameters: <channel> *( \",\" <channel> ) <user> *( \",\" <user> ) [<comment>]. This is used to request the forced removal of a user from a channel.\n"+
   "PRIVMSG: Parameters: <msgtarget> <text to be sent>. This is used to send private messages between users.\n"+
@@ -100,9 +108,9 @@ function help(socket){
   "INFO: Parameters: [ <target> ]. The INFO command is REQUIRED to return information describing the server: its version, when it was compiled, the patchlevel, when it was started, and any other miscellaneous information which may be considered to be relevant.\n"+
   "SERVLIST:  Parameters: [ <mask> [ <type> ] ]. The SERVLIST command is used to list services currently connected to the network and visible to the user issuing the command.\n"+
   "SQUERY: Parameters: <servicename> <text> The SQUERY command is used similarly to PRIVMSG. The only difference is that the recipient MUST be a service. This is the only way for a text message to be delivered to a service.\n"+
-  "WHO: Parameters: [ <mask> [ "o" ] ]. The WHO command is used by a client to generate a query which returns a list of information which ’matches’ the <mask> parameter given by the client.\n"+
-  "WHOIS: Parameters: [ <target> ] <mask> *( "," <mask> ) This command is used to query information about particular user.\n"+
-  "WHOWAS: Parameters: <nickname> *( "," <nickname> ) [ <count> [ <target> ] ]. Whowas asks for information about a nickname which no longer exists.\n"+
+  "WHO: Parameters: [ <mask> [ \"o\" ] ]. The WHO command is used by a client to generate a query which returns a list of information which ’matches’ the <mask> parameter given by the client.\n"+
+  "WHOIS: Parameters: [ <target> ] <mask> *( \",\" <mask> ) This command is used to query information about particular user.\n"+
+  "WHOWAS: Parameters: <nickname> *( \",\" <nickname> ) [ <count> [ <target> ] ]. Whowas asks for information about a nickname which no longer exists.\n"+
   "KILL: Parameters: <nickname> <comment> The KILL command is used to cause a client-server connection to be closed by the server which has the actual connection.\n"+
   "PING : Parameters: <server1> [ <server2> ] The PING command is used to test the presence of an active client or server at the other end of the connection. \n"+
   //"PONG: Parameters: <server> [ <server2> ] PONG message is a reply to ping message.\n"+
@@ -115,74 +123,58 @@ function help(socket){
   "USERS:  Parameters: [ <target> ] The USERS command returns a list of users logged into the server in a format similar to the UNIX commands who(1), rusers(1) and finger(1).\n"+
   "WALLOPS:  Parameters: <Text to be sent> The WALLOPS command is used to send a message to all currently connected users who have set the ’w’ user mode for themselves.\n"+
   "USERHOST:  Parameters: <nickname> *( SPACE <nickname> ) The USERHOST command takes a list of up to 5 nicknames, each separated by a space character and returns a list of information about each nickname that it found. \n"+
-  "ISON:  Parameters: <nickname> *( SPACE <nickname> ) The ISON command was implemented to provide a quick and efficient means to get a response about whether a given nickname was currently on IRC.\n"  
+  "ISON:  Parameters: <nickname> *( SPACE <nickname> ) The ISON command was implemented to provide a quick and efficient means to get a response about whether a given nickname was currently on IRC.\n"
   );
 }
 
 // Set the user's nickname
 function nick(args,client, clients){
-  //TODO Corrigir função, erro ao usar.
   if(args.length < 2)
-  {
     client.socket.write("Need more params\n\n");
-  }
-  else
-  {
+  else{
     client.nick = args[1].toString();
     broadcast(client.nick.toString() + " joined the chat\n", client, clients);
     client.socket.write("NICK command executed with sucess.\n");
   }
 }
 
-function pass(args, socket) {
-    //TODO
-    socket.write("PASS command executed with sucess.\n");
+// Set the user's password
+//TODO Precisa de algum tipo de criptografia ou hash ?
+function pass(args, client) {
+  if(args.length < 2)
+    client.socket.write("Need more params\n\n");
+  else{
+    client.pswd = args[1].toString();
+    client.socket.write("PASS command executed with sucess.\n");
+  }
 }
 
-function user(args, socket) {
-    //TODO
-    socket.write("USER command executed with sucess.\n");
-}
-
-function oper(args, socket) {
-    //TODO
-    socket.write("OPER command executed with sucess.\n");
-}
-
-function mode(args, socket) {
-    //TODO
-    socket.write("MODE command executed with sucess.\n");
-}
-
-function service(args, socket) {
-    //TODO
-    socket.write("JOIN command executed with sucess.\n");
-}
-
+// Client quit from the server
 function quit(args, client, clients) {
   var socket = client.socket;
   if(!args[1]){
     // Remove usuario sem mostrar nenhuma mensagem
-    if(broadcast(client.nick + " quits\n", client));
+    if(handler.broadcast(client.nick + " quits\n", client));
     socket.end();
     remove(client);
   } else {
     // Remove usuario exibindo mensagem escrita por ele
     args.splice(0, 1);
     var mesg = args.join(" ");
-    broadcast(client.nick + " quits: " + mesg + "\n", client, clients);
+    handler.broadcast(client.nick + " quits: " + mesg + "\n", client, clients);
     socket.end();
     remove(client);
   }
 }
 
+// Remove the client from the server
 function remove(client) {
     delete server.nicks[client.nick];
     var index = server.clients.indexOf(client);
     server.clients.splice(index, 1);
 }
 
-
+// Client enter in a channel
 function join(args, client, clients, nicks, channels) {
     var socket = client.socket;
 
@@ -206,6 +198,7 @@ function join(args, client, clients, nicks, channels) {
     }
 }
 
+// Client send a message
 function privmsg(args, client, clients) {
   var socket = client.socket;
   if (!args[1] || !args[2]) {
@@ -223,38 +216,7 @@ function privmsg(args, client, clients) {
   }
 }
 
-
-
-function part(args, socket) {
-    //TODO
-    socket.write("PART command executed with sucess.\n");
-}
-
-function topic() {
-    //TODO
-    socket.write("TOPIC command executed with sucess.\n");
-}
-
-function names() {
-    //TODO
-    socket.write("NAMES command executed with sucess.\n");
-}
-
-function list() {
-    //TODO
-    socket.write("LIST command executed with sucess.\n");
-}
-
-function invite() {
-    //TODO
-    socket.write("INTITE command executed with sucess.\n");
-}
-
-function kick() {
-    //TODO
-    socket.write("KICK command executed with sucess.\n");
-}
-
+// Client send a message
 function privmsg(args, client, clients, channels) {
     var socket = client.socket;
     var comando = args.join(" ");
@@ -286,4 +248,57 @@ function privmsg(args, client, clients, channels) {
         }
     });
 }
-exports.broadcast = broadcast;
+
+// Set the client's username
+function user(args, socket) {
+    //TODO
+    socket.write("USER command executed with sucess.\n");
+}
+
+// Enter with operator mode
+function oper(args, client) {
+    if(args[1] == passOp){
+      client.isOp = true;
+    }
+    socket.write("OPER command executed with sucess.\n");
+}
+
+function mode(args, client) {
+    //TODO
+    socket.write("MODE command executed with sucess.\n");
+}
+
+function service(args, socket) {
+    //TODO
+    socket.write("JOIN command executed with sucess.\n");
+}
+
+function part(args, socket) {
+    //TODO
+    socket.write("PART command executed with sucess.\n");
+}
+
+function topic() {
+    //TODO
+    socket.write("TOPIC command executed with sucess.\n");
+}
+
+function names() {
+    //TODO
+    socket.write("NAMES command executed with sucess.\n");
+}
+
+function list() {
+    //TODO
+    socket.write("LIST command executed with sucess.\n");
+}
+
+function invite() {
+    //TODO
+    socket.write("INTITE command executed with sucess.\n");
+}
+
+function kick() {
+    //TODO
+    socket.write("KICK command executed with sucess.\n");
+}
