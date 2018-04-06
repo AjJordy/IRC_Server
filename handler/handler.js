@@ -13,7 +13,7 @@ exports.broadcast = function(message, sender, clients) {
         process.stdout.write(sender.nick+": "+message+"\n");
     });
   } catch (e){
-        console.log(e.getMessage(), e);
+        console.log("erro", e);
   }
 
 }
