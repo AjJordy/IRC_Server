@@ -17,7 +17,7 @@ net.createServer(function (socket) {
   // Identify this client
   //socket.name = socket.remoteAddress + ":" + socket.remotePort;
   //Create client object and assign socket and attributes
-	var curr_Client = clientEntity.constructor(socket);
+  var curr_Client = clientEntity.constructor(socket);
   curr_Client.nick = "Anonymous";
 
   // Put this new client in the list
@@ -30,7 +30,7 @@ net.createServer(function (socket) {
   // Handle incoming messages from clients.
   socket.on('data', function (data,curr_Client,clients) {
     var args = data.toString().trim().split(" ");
-		handler.analyze(args, client, clients, channels);
+		handler.analyze(args, curr_Client, clients, channels);
 		console.log(data.toString().trim());
 	});
 
