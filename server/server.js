@@ -30,7 +30,7 @@ net.createServer(function (socket) {
   // Handle incoming messages from clients.
   socket.on('data', function (data,curr_Client,clients) {
     var args = data.toString().trim().split(" ");
-		handler.analyze(args, curr_Client, clients);
+		handler.analyze(args, client, clients, channels);
 		console.log(data.toString().trim());
 	});
 
