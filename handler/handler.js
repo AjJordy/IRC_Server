@@ -44,19 +44,24 @@ exports.analyze = function (data, client, clients) {
   else if (args[0] === COMMANDS.INVITE) invite(args, client.socket);
   else if (args[0] === COMMANDS.KICK) kick(args, client.socket, target);
   else if (args[0] === COMMANDS.PRIVMSG) privmsg(args, client, clients, channels);
-  else broadcast(data.toString().trim(), client.socket, clients);
+  else broadcast(data.toString().trim(), client, clients);
 
 };
 
 // Send a message to all clients
 function broadcast(message, sender, clients) {
-  clients.forEach(function (client) {
+  try {
+    clients.forEach(function (client) {
     // Don't want to send it to sender
     if (client === sender) return;
-    client.socket.write(sender.nick+": "+message+"\n");
-  });
-  // Log it to the server output too
-  process.stdout.write(sender.nick+": "+message+"\n");
+        client.socket.write(sender.nick+": "+message+"\n");
+        // Log it to the server output too
+        process.stdout.write(sender.nick+": "+message+"\n");
+    });
+  } catch (e){
+        console.log(e.getMessage(), e);
+  }
+
 }
 
 // List all commands available
