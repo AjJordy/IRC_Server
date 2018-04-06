@@ -17,6 +17,7 @@
   },
   "homepage": "https://gitlab.com/sd1-ec-2018-1/p1-g1#README",
   "devDependencies": {
+    "faker": "^4.1.0",
     "jasmine": "^3.1.0"
   }
 }

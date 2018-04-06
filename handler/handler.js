@@ -2,6 +2,27 @@
 net = require('net');
 server = require('../server/server.js');
 
+
+const COMMANDS = {
+    HELP: 'HELP',
+    NICK: 'NICK',
+    PASS: 'PASS',
+    USER: 'USER',
+    OPER: 'OPER',
+    MODE: 'MODE',
+    SERVICE: 'SERVICE',
+    QUIT: 'QUIT',
+    JOIN: 'JOIN',
+    PART: 'PART',
+    TOPIC: 'TOPIC',
+    NAMES: 'NAMES',
+    LIST: 'LIST',
+    INVITE: 'INVITE',
+    KICK: 'KICK',
+    PRIVMSG: 'PRIVMSG'
+};
+
+
 var nickname = "Anonymous";
 
 exports.analyze = function (data, client, clients) {
@@ -113,29 +134,29 @@ function nick(args,client, clients){
   }
 }
 
-function pass(args,socket) {
-  //TODO
-  socket.write("PASS command executed with sucess.\n");
+function pass(args, socket) {
+    //TODO
+    socket.write("PASS command executed with sucess.\n");
 }
 
-function user(args,socket) {
-  //TODO
-  socket.write("USER command executed with sucess.\n");
+function user(args, socket) {
+    //TODO
+    socket.write("USER command executed with sucess.\n");
 }
 
-function oper(args,socket){
-  //TODO
-  socket.write("OPER command executed with sucess.\n");
+function oper(args, socket) {
+    //TODO
+    socket.write("OPER command executed with sucess.\n");
 }
 
-function mode(args,socket){
-  //TODO
-  socket.write("MODE command executed with sucess.\n");
+function mode(args, socket) {
+    //TODO
+    socket.write("MODE command executed with sucess.\n");
 }
 
-function service(args,socket){
-  //TODO
-  socket.write("JOIN command executed with sucess.\n");
+function service(args, socket) {
+    //TODO
+    socket.write("JOIN command executed with sucess.\n");
 }
 
 function quit(args, client, clients) {
@@ -156,33 +177,33 @@ function quit(args, client, clients) {
 }
 
 function remove(client) {
-  delete server.nicks[client.nick];
-  var index = server.clients.indexOf(client);
-  server.clients.splice(index, 1);
+    delete server.nicks[client.nick];
+    var index = server.clients.indexOf(client);
+    server.clients.splice(index, 1);
 }
 
 
+function join(args, client, clients, nicks, channels) {
+    var socket = client.socket;
 
-function join(args, client, clients, nicks, channels){
-  var socket = client.socket;
-
-  if(!args[1]){
-    socket.write("ERROR: invalid request, try /join <#channel>\n");
-    return;
-  }
-  else{
-    var channelName = args.slice(1);
-    for(i = 0; i < channels.length; i++){
-      //checa se o canal existe
-      if(channels[i].name == channelName){
-        var chn = channels[i];
-        client.channels.push(chn);
-        channels[i].clients.push(client);
-        server.channels=channels;
-        client.socket.write("You joined " + chn.name + ".\n");
-      }
+    if (!args[1]) {
+        socket.write("ERROR: invalid request, try /join <#channel>\n");
+        return;
     }
-  }
+    else {
+        var channelName = args.slice(1);
+
+        for (i = 0; i < channels.length; i++) {
+            //checa se o canal existe
+            if (channels[i].name == channelName) {
+                var chn = channels[i];
+                client.channels.push(chn);
+                channels[i].clients.push(client);
+                server.channels = channels;
+                client.socket.write("You joined " + chn.name + ".\n");
+            }
+        }
+    }
 }
 
 function privmsg(args, client, clients) {
@@ -204,33 +225,65 @@ function privmsg(args, client, clients) {
 
 
 
-function part(args, socket){
-  //TODO
-  socket.write("PART command executed with sucess.\n");
+function part(args, socket) {
+    //TODO
+    socket.write("PART command executed with sucess.\n");
 }
 
-function topic(){
-  //TODO
-  socket.write("TOPIC command executed with sucess.\n");
+function topic() {
+    //TODO
+    socket.write("TOPIC command executed with sucess.\n");
 }
 
-function names(){
-  //TODO
-  socket.write("NAMES command executed with sucess.\n");
+function names() {
+    //TODO
+    socket.write("NAMES command executed with sucess.\n");
 }
 
-function list(){
-  //TODO
-  socket.write("LIST command executed with sucess.\n");
+function list() {
+    //TODO
+    socket.write("LIST command executed with sucess.\n");
 }
 
-function invite(){
-  //TODO
-  socket.write("INTITE command executed with sucess.\n");
+function invite() {
+    //TODO
+    socket.write("INTITE command executed with sucess.\n");
 }
 
-function kick(){
-  //TODO
-  socket.write("KICK command executed with sucess.\n");
+function kick() {
+    //TODO
+    socket.write("KICK command executed with sucess.\n");
+}
+
+function privmsg(args, client, clients, channels) {
+    var socket = client.socket;
+    var comando = args.join(" ");
+    var regexFindDestinatarios = new RegExp(COMMANDS.PRIVMSG + ' (.*) :\ *');
+    var destinatariosFind = comando.match(regexFindDestinatarios);
+    if (destinatariosFind === null || comando.indexOf(':') === -1) {
+        socket.write("Incomplete Command");
+        return;
+    }
+    var destinatarios = destinatariosFind[1].replace(/\s/g, '').split(',');
+
+    var writeMessage = function (clientDest) {
+        var msg = comando.substr(comando.indexOf(':') + 1);
+        clientDest.socket.write("Private message from " + client.nick + " " + msg + "\n");
+    }.bind(this);
+
+
+    clients.forEach(function (clientDest) {
+        if (destinatarios.indexOf(clientDest.nick) !== -1) {
+            writeMessage(clientDest);
+        }
+    });
+
+    channels.forEach(function (channelDest) {
+        if (destinatarios.indexOf(channelDest.name) !== -1) {
+            channelDest.members.forEach(function (clientDest) {
+                writeMessage(clientDest);
+            });
+        }
+    });
 }
 exports.broadcast = broadcast;
