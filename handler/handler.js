@@ -89,11 +89,18 @@ function help(socket) {
 }
 
 // Set the user's nickname
-function nick(args, client, clients) {
-    //TODO Corrigir função, erro ao usar.
-    nickname = args[1].toString();
-    broadcast(nickname.toString() + " joined the chat\n", client.socket);
-    socket.write("NICK command executed with sucess.\n");
+function nick(args,client, clients){
+  //TODO Corrigir função, erro ao usar.
+  if(args.length < 2)
+  {
+    client.socket.write("Need more params\n\n");
+  }
+  else
+  {
+    client.nick = args[1].toString();
+    broadcast(client.nick.toString() + " joined the chat\n", client, clients);
+    client.socket.write("NICK command executed with sucess.\n");
+  }
 }
 
 function pass(args, socket) {

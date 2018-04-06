@@ -24,8 +24,8 @@ net.createServer(function (socket) {
   clients.push(curr_Client);
 
   // Send a nice welcome message and announce
-  socket.write("Welcome " + socket.name + "\nHELP to know all commands.\n");
-  broadcast(socket.name + " joined the chat\n", curr_Client,clients);
+  socket.write("Welcome " + curr_Client.nick + "\nHELP to know all commands.\n");
+  handler.broadcast(curr_Client.nick + " joined the chat\n", curr_Client,clients);
 
   // Handle incoming messages from clients.
   socket.on('data', function (data,curr_Client,clients) {
@@ -36,22 +36,12 @@ net.createServer(function (socket) {
 
   // Remove the client from the list when it leaves
   socket.on('end', function () {
-    clients.splice(clients.indexOf(client.socket), 1);
-    handler.broadcast(socket.name + " left the chat.\n", client.socket, clients);
+    clients.splice(clients.indexOf(curr_Client.socket), 1);
+    handler.broadcast(curr_Client.nick + " left the chat.\n", curr_Client, clients);
   });
 
 
 }).listen(5000);
-
-function broadcast(message, sender, clients) {
-  clients.forEach(function (client) {
-    // Don't want to send it to sender
-    if (client === sender) return;
-    client.socket.write(message+"\n");
-  });
-  // Log it to the server output too
-  process.stdout.write(message);
-}
 
 // Put a friendly message on the terminal of the server.
 console.log("Chat server running at port 5000\n");
