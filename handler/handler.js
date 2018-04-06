@@ -2,6 +2,8 @@
 net = require('net');
 server = require('../server/server.js');
 
+passOp = "admin";
+
 // Send a message to all clients
 exports.broadcast = function(message, sender, clients) {
   try {
@@ -122,50 +124,33 @@ function help(socket){
   "USERS:  Parameters: [ <target> ] The USERS command returns a list of users logged into the server in a format similar to the UNIX commands who(1), rusers(1) and finger(1).\n"+
   "WALLOPS:  Parameters: <Text to be sent> The WALLOPS command is used to send a message to all currently connected users who have set the ’w’ user mode for themselves.\n"+
   "USERHOST:  Parameters: <nickname> *( SPACE <nickname> ) The USERHOST command takes a list of up to 5 nicknames, each separated by a space character and returns a list of information about each nickname that it found. \n"+
-  "ISON:  Parameters: <nickname> *( SPACE <nickname> ) The ISON command was implemented to provide a quick and efficient means to get a response about whether a given nickname was currently on IRC.\n"  
+  "ISON:  Parameters: <nickname> *( SPACE <nickname> ) The ISON command was implemented to provide a quick and efficient means to get a response about whether a given nickname was currently on IRC.\n"
   );
 }
 
 // Set the user's nickname
 function nick(args,client, clients){
-  //TODO Corrigir função, erro ao usar.
   if(args.length < 2)
-  {
     client.socket.write("Need more params\n\n");
-  }
-  else
-  {
+  else{
     client.nick = args[1].toString();
     broadcast(client.nick.toString() + " joined the chat\n", client, clients);
     client.socket.write("NICK command executed with sucess.\n");
   }
 }
 
-function pass(args, socket) {
-    //TODO
-    socket.write("PASS command executed with sucess.\n");
+// Set the user's password
+//TODO Precisa de algum tipo de criptografia ou hash ?
+function pass(args, client) {
+  if(args.length < 2)
+    client.socket.write("Need more params\n\n");
+  else{
+    client.pswd = args[1].toString();
+    client.socket.write("PASS command executed with sucess.\n");
+  }
 }
 
-function user(args, socket) {
-    //TODO
-    socket.write("USER command executed with sucess.\n");
-}
-
-function oper(args, socket) {
-    //TODO
-    socket.write("OPER command executed with sucess.\n");
-}
-
-function mode(args, socket) {
-    //TODO
-    socket.write("MODE command executed with sucess.\n");
-}
-
-function service(args, socket) {
-    //TODO
-    socket.write("JOIN command executed with sucess.\n");
-}
-
+// Client quit from the server
 function quit(args, client, clients) {
   var socket = client.socket;
   if(!args[1]){
@@ -183,13 +168,14 @@ function quit(args, client, clients) {
   }
 }
 
+// Remove the client from the server
 function remove(client) {
     delete server.nicks[client.nick];
     var index = server.clients.indexOf(client);
     server.clients.splice(index, 1);
 }
 
-
+// Client enter in a channel
 function join(args, client, clients, nicks, channels) {
     var socket = client.socket;
 
@@ -211,36 +197,6 @@ function join(args, client, clients, nicks, channels) {
             }
         }
     }
-}
-
-function part(args, socket) {
-    //TODO
-    socket.write("PART command executed with sucess.\n");
-}
-
-function topic() {
-    //TODO
-    socket.write("TOPIC command executed with sucess.\n");
-}
-
-function names() {
-    //TODO
-    socket.write("NAMES command executed with sucess.\n");
-}
-
-function list() {
-    //TODO
-    socket.write("LIST command executed with sucess.\n");
-}
-
-function invite() {
-    //TODO
-    socket.write("INTITE command executed with sucess.\n");
-}
-
-function kick() {
-    //TODO
-    socket.write("KICK command executed with sucess.\n");
 }
 
 function privmsg(args, client, clients, channels) {
@@ -273,4 +229,58 @@ function privmsg(args, client, clients, channels) {
             });
         }
     });
+}
+
+// Set the client's username
+function user(args, socket) {
+    //TODO
+    socket.write("USER command executed with sucess.\n");
+}
+
+// Enter with operator mode
+function oper(args, client) {
+    if(args[1] == passOp){
+      client.isOp = true;
+    }
+    socket.write("OPER command executed with sucess.\n");
+}
+
+function mode(args, client) {
+    //TODO
+    socket.write("MODE command executed with sucess.\n");
+}
+
+function service(args, socket) {
+    //TODO
+    socket.write("JOIN command executed with sucess.\n");
+}
+
+function part(args, socket) {
+    //TODO
+    socket.write("PART command executed with sucess.\n");
+}
+
+function topic() {
+    //TODO
+    socket.write("TOPIC command executed with sucess.\n");
+}
+
+function names() {
+    //TODO
+    socket.write("NAMES command executed with sucess.\n");
+}
+
+function list() {
+    //TODO
+    socket.write("LIST command executed with sucess.\n");
+}
+
+function invite() {
+    //TODO
+    socket.write("INTITE command executed with sucess.\n");
+}
+
+function kick() {
+    //TODO
+    socket.write("KICK command executed with sucess.\n");
 }
