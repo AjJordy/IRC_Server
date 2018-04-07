@@ -28,7 +28,7 @@ net.createServer(function (socket) {
   handler.broadcast(curr_Client.nick + " joined the chat\n", curr_Client,clients);
 
   // Handle incoming messages from clients.
-  socket.on('data', function (data,curr_Client,clients) {
+  socket.on('data', function (data) {
     var args = data.toString().trim().split(" ");
 		handler.analyze(args, curr_Client, clients, channels);
 		console.log(data.toString().trim());
