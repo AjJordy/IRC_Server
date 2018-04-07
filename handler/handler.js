@@ -33,7 +33,8 @@ exports.analize = function (data, client, clients) {
   else if ( args[0] == "/INVITE") invite(args,client.socket);
   else if ( args[0] == "/KICK") kick(args,client.socket,target);
   else if ( args[0] == "/PRIVMSG") privmsg(target,args,client.socket);
-  else client.socket.write("Error: Non-existent command.\n");
+  else exports.broadcast(data, client, clients);
+  //else client.socket.write("Error: Non-existent command.\n");
 }
 
 // List all commands available

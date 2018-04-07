@@ -24,13 +24,14 @@ net.createServer(function (socket) {
 
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
+
     var args = data.toString().trim().split(" ");
-		if(args[0][0] === '/')
-			handler.analize(args, client, clients);
-		else
+
+    handler.analize(args, client, clients);
+		/*else
 		{
 			handler.broadcast(data.toString().trim(), client, clients);
-		}
+		}*/
     
   });
 
