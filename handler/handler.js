@@ -152,51 +152,14 @@ function pass(args, client) {
 
 // Client quit from the server
 function quit(args, client, clients) {
-  var socket = client.socket;
-  if(!args[1]){
-    // Remove usuario sem mostrar nenhuma mensagem
-    if(handler.broadcast(client.nick + " quits\n", client));
-    socket.end();
-    remove(client);
-  } else {
-    // Remove usuario exibindo mensagem escrita por ele
-    args.splice(0, 1);
-    var mesg = args.join(" ");
-    handler.broadcast(client.nick + " quits: " + mesg + "\n", client, clients);
-    socket.end();
-    remove(client);
-  }
 }
 
 // Remove the client from the server
 function remove(client) {
-    delete server.nicks[client.nick];
-    var index = server.clients.indexOf(client);
-    server.clients.splice(index, 1);
 }
 
 // Client enter in a channel
 function join(args, client, clients, nicks, channels) {
-    var socket = client.socket;
-
-    if (!args[1]) {
-        socket.write("ERROR: invalid request, try /join <#channel>\n");
-        return;
-    }
-    else {
-        var channelName = args.slice(1);
-
-        for (i = 0; i < channels.length; i++) {
-            //checa se o canal existe
-            if (channels[i].name == channelName) {
-                var chn = channels[i];
-                client.channels.push(chn);
-                channels[i].clients.push(client);
-                server.channels = channels;
-                client.socket.write("You joined " + chn.name + ".\n");
-            }
-        }
-    }
 }
 
 function privmsg(args, client, clients, channels) {
