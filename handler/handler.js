@@ -23,7 +23,7 @@ exports.analize = function (data, client, clients) {
   if (args[0] == "/HELP") help(socket);
   else if (args[0] == "/NICK") nick(args,client, clients);
   else if (args[0] == "/PASS") pass(args,client.socket);
-  else if ( args[0] == "/USER") user(args,client);
+  else if ( args[0] == "/USER") user(args,client, clients);
   else if ( args[0] == "/OPER") oper(args,client.socket);
   else if ( args[0] == "/MODE") mode(args,client.socket);
   else if ( args[0] == "/SERVICE") service(args,client.socket);
@@ -89,8 +89,7 @@ function pass(args,socket) {
   socket.write("PASS command executed with sucess.\n");
 }
 
-function user(args,client) {
-  //TODO
+function user(args,client, clients) {
 
   if(args.length < 5)
   {
@@ -98,17 +97,46 @@ function user(args,client) {
   }
   else
   {
-    client.userName = args[1];
 
-    for(var i = 4 ; i < args.length ; i++)
-    {
-      client.realName += args[i];
-      client.realName += " ";
+    flag = clients.every(function(client2) {
+             return args[1] != client2.userName;
+    });
+
+    if(!flag) {
+
+      client.socket.write("This username already exists. Try another one\n\n");
+
     }
+    else {
 
-    client.realName = client.realName.trim();
+      if(args[2].length > 1) {
 
-    client.socket.write("USER command executed with sucess.\n");
+        client.socket.write("Mode parameter need be 8 or less");
+
+      }
+      else {
+
+        client.userName = args[1];
+
+        if(+args[2] & 4)
+          client.wallops = true;
+
+        if(+args[2] & 8)
+          client.visible = false;
+        
+        for(var i = 4 ; i < args.length ; i++)
+        {
+          client.realName += args[i];
+          client.realName += " ";
+        }
+
+        client.realName = client.realName.trim();
+
+        client.socket.write("USER command executed with sucess.\n");
+
+        console.log(client);
+      }
+    }
   }
 }
 
