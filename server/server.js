@@ -25,9 +25,7 @@ net.createServer(function (socket) {
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
 
-    var args = data.toString().trim().split(" ");
-
-    handler.analize(args, client, clients);
+    handler.analize(data, client, clients);
 		/*else
 		{
 			handler.broadcast(data.toString().trim(), client, clients);
@@ -37,7 +35,7 @@ net.createServer(function (socket) {
 
   // Remove the client from the list when it leaves
   socket.on('end', function () {
-    clients.splice(clients.indexOf(client.socket), 1);
+    clients.splice(clients.indexOf(client), 1);
     handler.broadcast(client.nick + " left the chat.\n", client, clients);
   });
 

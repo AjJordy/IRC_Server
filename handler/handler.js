@@ -7,15 +7,18 @@ exports.broadcast = function (message, sender, clients) {
   });
   // Log it to the server output too
   
-  process.stdout.write(message+"\n");
+ // process.stdout.write(message+"\n");
 }
 
 exports.analize = function (data, client, clients) {
+
   var message = String(data).trim();
 
   //Os args estavam vindo separados por vírgula, e não por espaço
 
-  var args = message.split(",");
+  // console.log(message);
+
+  var args = message.split(" ");
 
   if (args[0] == "/HELP") help(socket);
   else if (args[0] == "/NICK") nick(args,client, clients);
