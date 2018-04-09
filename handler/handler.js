@@ -3,6 +3,7 @@ net = require('net');
 server = require('../server/server.js');
 
 passOp = "admin";
+ver = "1.0";
 
 // Send a message to all clients
 exports.broadcast = function(message, sender, clients) {
@@ -36,7 +37,8 @@ const COMMANDS = {
     LIST: 'LIST',
     INVITE: 'INVITE',
     KICK: 'KICK',
-    PRIVMSG: 'PRIVMSG'
+    PRIVMSG: 'PRIVMSG',
+    VERSION: 'VERSION'
 };
 
 
@@ -56,12 +58,13 @@ exports.analyze = function (data, client, clients) {
   else if (args[0] === COMMANDS.JOIN) join(args, client, clients, nicks, channels);
   else if (args[0] === COMMANDS.PART) part(args, client.socket);
   else if (args[0] === COMMANDS.TOPIC) topic(args, client.socket);
-  else if (args[0] === COMMANDS.NAMES) names(args, client.socket);
+  else if (args[0] === COMMANDS.NAMES) names(args, client,channels);
   else if (args[0] === COMMANDS.LIST) list(args, client.socket);
   else if (args[0] === COMMANDS.INVITE) invite(args, client.socket);
   else if (args[0] === COMMANDS.KICK) kick(args, client.socket, target);
   else if (args[0] === COMMANDS.PRIVMSG) privmsg(args, client, clients, channels);
-  else handler.broadcast(data.toString().trim(), client, clients);
+  else if (args[0] === COMMANDS.VERSION) version(args);
+  else client.socket.write("Command doesn't exist.");//handler.broadcast(data.toString().trim(), client, clients);
 
 };
 
@@ -88,7 +91,6 @@ function help(socket){
   "\nCommands of Channel operations:\n\n"+
   "JOIN: Parameters: ( <channel> *( \",\" <channel> ) [ <key> *( \",\" <key> ) ] ) / \"0\" To enter in a channel.\n"+
   "PART:  Parameters: <channel> *( \",\" <channel> ) [ <Part Message> ]. Causes the user sending the message to be removed from the list of active members\n"+
-  "MODE: Parameters: <channel> *( ( \"-\" / \"+\" ) *<modes> *<modeparams> ). The MODE command is provided so that users may query and change the characteristics of a channel.\n"+
   "TOPIC: Parameters: <channel> [ <topic> ]. This is used to change or view the topic of a channel.\n"+
   "NAMES: Parameters: [ <channel> \*( \",\" <channel> ) [ <target> ] ]. A user can list all nicknames that are visible to him.\n"+
   "LIST: Parameters: [ <channel> *( \",\" <channel> ) [ <target> ] ]. The list command is used to list channels and their topics.\n"+
@@ -114,8 +116,8 @@ function help(socket){
   "WHOWAS: Parameters: <nickname> *( \",\" <nickname> ) [ <count> [ <target> ] ]. Whowas asks for information about a nickname which no longer exists.\n"+
   "KILL: Parameters: <nickname> <comment> The KILL command is used to cause a client-server connection to be closed by the server which has the actual connection.\n"+
   "PING : Parameters: <server1> [ <server2> ] The PING command is used to test the presence of an active client or server at the other end of the connection. \n"+
-  //"PONG: Parameters: <server> [ <server2> ] PONG message is a reply to ping message.\n"+
-  //" ERROR: Parameters: <error message> The ERROR command is for use by servers when reporting a serious or fatal error to its peers.\n"+
+  "PONG: Parameters: <server> [ <server2> ] PONG message is a reply to ping message.\n"+
+  " ERROR: Parameters: <error message> The ERROR command is for use by servers when reporting a serious or fatal error to its peers.\n"+
   "AWAY: Parameters: [ <text> ] With the AWAY command, clients can set an automatic reply string for any PRIVMSG commands directed at them (not to a channel they are on).\n"+
   "REHASH:  Parameters: [None]. The rehash command is an administrative command which can be used by an operator to force the server to re-read and process its configuration file.\n"+
   "DIE:  Parameters: [None]. An operator can use the DIE command to shutdown the server.\n"+
@@ -140,7 +142,6 @@ function nick(args,client, clients){
 }
 
 // Set the user's password
-//TODO Precisa de algum tipo de criptografia ou hash ?
 function pass(args, client) {
   if(args.length < 2)
     client.socket.write("Need more params\n\n");
@@ -245,6 +246,32 @@ function oper(args, client) {
     socket.write("OPER command executed with sucess.\n");
 }
 
+// List the user's name of the channel
+function names(args, client, channels) {
+    var channelName = args.slice(1);
+    for (i = 0; i < channels.length; i++) {
+        // Checa se o canal existe
+        if (channels[i].name == channelName) {
+            var users = channels[i].members;
+            for(j=0;j<users.length;j++){
+                client.socket.write(users[i].name + ".\n");
+            }
+        }
+    }
+}
+
+// List all the channels
+function list(args, client, channels) {
+    for (i = 0; i < channels.length; i++) {
+        client.socket.write(channels[i].name + ".\n");
+    }
+}
+
+// Show the server's version
+function version(client) {
+    client.socket.write("IRC Server "+ ver);
+}
+
 function mode(args, client) {
     //TODO
     socket.write("MODE command executed with sucess.\n");
@@ -265,15 +292,6 @@ function topic() {
     socket.write("TOPIC command executed with sucess.\n");
 }
 
-function names() {
-    //TODO
-    socket.write("NAMES command executed with sucess.\n");
-}
-
-function list() {
-    //TODO
-    socket.write("LIST command executed with sucess.\n");
-}
 
 function invite() {
     //TODO
