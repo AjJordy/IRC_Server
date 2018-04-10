@@ -38,7 +38,10 @@ const COMMANDS = {
     INVITE: 'INVITE',
     KICK: 'KICK',
     PRIVMSG: 'PRIVMSG',
-    VERSION: 'VERSION'
+    VERSION: 'VERSION',
+	  WHO: 'WHO',
+	  BACK: 'BACK',
+	  AWAY: 'AWAY'
 };
 
 
@@ -51,11 +54,14 @@ exports.analyze = function (data, client, clients) {
   else if (args[0] === COMMANDS.NICK) nick(args, client, clients);
   else if (args[0] === COMMANDS.PASS) pass(args, client.socket);
   else if (args[0] === COMMANDS.USER) user(args, client.socket);
+  else if (args[0] === COMMANDS.AWAY) away(args, client);
+  else if (args[0] === COMMANDS.BACK) back(args, client)
+  else if (args[0] === COMMANDS.WHO)  who(args, client, clients);
   else if (args[0] === COMMANDS.OPER) oper(args, client.socket);
   else if (args[0] === COMMANDS.MODE) mode(args, client.socket);
   else if (args[0] === COMMANDS.SERVICE) service(args, client.socket);
-  else if (args[0] === COMMANDS.QUIT) quit(args, client, clients);
-  else if (args[0] === COMMANDS.JOIN) join(args, client, clients, nicks, channels);
+  else if (args[0] === COMMANDS.QUIT) quit(args, client.socket);
+  else if (args[0] === COMMANDS.JOIN) join(args, client.socket);
   else if (args[0] === COMMANDS.PART) part(args, client.socket);
   else if (args[0] === COMMANDS.TOPIC) topic(args, client.socket);
   else if (args[0] === COMMANDS.NAMES) names(args, client,channels);
@@ -153,7 +159,7 @@ function pass(args, client) {
 
 // Client quit from the server
 function quit(args, client, clients) {
-	 var socket = client.socket;
+  var socket = client.socket;
   if(!args[1]){
     // Remove usuario sem mostrar nenhuma mensagem
     if(handler.broadcast(client.nick + " quits\n", client));
@@ -168,17 +174,113 @@ function quit(args, client, clients) {
     remove(client);
   }
 }
+function away(args, client){
+  var socket = client.socket;
+
+  if(!args[1])
+  {
+    socket.write("ERROR: invalid request, try /away <message>\n");
+    return;
+  }
+  else
+  {
+    var msg = args.slice(1);
+
+    client.away = true;
+    client.awayMessage = msg.join(" ");
+
+    socket.write("Your status is set as AWAY: " + client.awayMsg + "\n");
+  }
+}
+
+function back(args, client){
+  var socket = client.socket;
+
+  if(args[1])
+  {
+    socket.write("ERROR: invalid request, try /back\n");
+    return;
+  }
+  else
+  {
+    client.away = false;
+    client.awayMessage = null;
+
+    socket.write("Your status is no longer set as AWAY.\n");
+  }
+}
+
+function who(args, client, clients)
+{
+  //query for all visible
+  if(!args[1] || args[1] == 0)
+  {
+    client.write("/who for all visible users:\n");
+
+    for(i = 0; i < clients.length; i++)
+    {
+      if(clients[i].visible)
+      {
+        client.write(clients.nick)
+      }
+    }
+  }
+  else if(args[1] && args[1] != 0)
+  {
+    if(args[2] && args[2] != 'o')
+    {
+      socket.write("ERROR: invalid request, try /who <mask> <o>\n");
+      return;
+    }
+    else
+    {
+      //search for operators
+      if(args[2] && args[2] == 'o')
+      {
+        client.write("/who for all operators matching mask''" + args[2] + "':\n'");
+
+        for(i = 0; i < clients.length; i++)
+        {
+          if(clients[i].visible && clients[i].isOp && (clients[i].nick.includes(args[2]) || clients[i].user.includes(args[2])))
+          {
+            client.write(clients.nick);
+          }
+        }
+
+      }
+      else
+      {
+        client.write("/who for all users matching mask''" + args[2] + "':\n'");
+
+        for(i = 0; i < clients.length; i++)
+        {
+          if(clients[i].visible && (clients[i].nick.includes(args[2]) || clients[i].user.includes(args[2])))
+          {
+            client.write(clients.nick);
+          }
+        }
+
+      }
+    }
+  }
+  else
+  {
+    socket.write("ERROR: invalid request, try /who <mask or 0>\n");
+    return;
+  }
+}
+
 
 // Remove the client from the server
 function remove(client) {
-	 delete server.nicks[client.nick];
+    delete server.nicks[client.nick];
     var index = server.clients.indexOf(client);
     server.clients.splice(index, 1);
 }
 
 // Client enter in a channel
 function join(args, client, clients, nicks, channels) {
-	var socket = client.socket;
+    var socket = client.socket;
 
     if (!args[1]) {
         socket.write("ERROR: invalid request, try /join <#channel>\n");
