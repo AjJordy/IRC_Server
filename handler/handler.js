@@ -53,7 +53,7 @@ exports.analyze = function (data, client, clients, channels) {
   if (args[0] === COMMANDS.HELP) help(socket);
   else if (args[0] === COMMANDS.NICK) nick(args, client, clients);
   else if (args[0] === COMMANDS.PASS) pass(args, client.socket);
-  else if (args[0] === COMMANDS.USER) user(args, client.socket);
+  else if (args[0] === COMMANDS.USER) user(args, client, clients);
   else if (args[0] === COMMANDS.AWAY) away(args, client);
   else if (args[0] === COMMANDS.BACK) back(args, client)
   else if (args[0] === COMMANDS.WHO)  who(args, client, clients);
@@ -335,9 +335,53 @@ function privmsg(args, client, clients, channels) {
 }
 
 // Set the client's username
-function user(args, socket) {
-    //TODO
-    socket.write("USER command executed with sucess.\n");
+function user(args,client, clients) {
+
+  if(args.length < 5)
+  {
+    client.socket.write("Need more params\n\n");
+  }
+  else
+  {
+
+    flag = clients.every(function(client2) {
+             return args[1] != client2.userName;
+    });
+
+    if(!flag) {
+
+      client.socket.write("This username already exists. Try another one\n\n");
+
+    }
+    else {
+
+      if(args[2].length > 1) {
+
+        client.socket.write("Mode parameter need be 8 or less");
+
+      }
+      else {
+
+        client.userName = args[1];
+
+        if(+args[2] & 4)
+          client.wallops = true;
+
+        if(+args[2] & 8)
+          client.visible = false;
+
+        for(var i = 4 ; i < args.length ; i++)
+        {
+          client.realName += args[i];
+          client.realName += " ";
+        }
+
+        client.realName = client.realName.trim();
+
+        client.socket.write("USER command executed with sucess.\n");
+      }
+    }
+  }
 }
 
 // Enter with operator mode
