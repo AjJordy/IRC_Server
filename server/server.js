@@ -9,35 +9,37 @@ clientEntity = require('../entity/entity_client.js');
 
 // Keep track of the chat clients
 var clients = [];
-
+var nicks = [];
+var channels = [];
 // Start a TCP Server
 net.createServer(function (socket) {
 
-  var client = clientEntity.constructor(socket);
+  // Identify this client
+  //socket.name = socket.remoteAddress + ":" + socket.remotePort;
+  //Create client object and assign socket and attributes
+  var curr_Client = clientEntity.constructor(socket);
+  curr_Client.nick = "Anonymous";
 
-  //Push new client into the list
-  clients.push(client);
+  // Put this new client in the list
+  clients.push(curr_Client);
 
   // Send a nice welcome message and announce
-  client.socket.write("Welcome " + client.nick + "\n/HELP to know all commands.\n");
-  handler.broadcast(client.nick + " joined the chat\n", client,clients);
+  socket.write("Welcome " + curr_Client.nick + "\nHELP to know all commands.\n");
+  handler.broadcast(curr_Client.nick + " joined the chat\n", curr_Client,clients);
 
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
-
-    handler.analize(data, client, clients);
-		/*else
-		{
-			handler.broadcast(data.toString().trim(), client, clients);
-		}*/
-    
-  });
+    var args = data.toString().trim().split(" ");
+		handler.analyze(args, curr_Client, clients, channels);
+		console.log(data.toString().trim());
+	});
 
   // Remove the client from the list when it leaves
   socket.on('end', function () {
-    clients.splice(clients.indexOf(client), 1);
-    handler.broadcast(client.nick + " left the chat.\n", client, clients);
+    clients.splice(clients.indexOf(curr_Client.socket), 1);
+    handler.broadcast(curr_Client.nick + " left the chat.\n", curr_Client, clients);
   });
+
 
 }).listen(5000);
 
