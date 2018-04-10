@@ -12,12 +12,26 @@ function createChannelWithClients(numberOfClients) {
         numberOfClients = 10;
 
     for (var i = 0; i < numberOfClients; i++) {
-        channel.members.push(clientFactory.createClientWithNick())
+        var client = clientFactory.createClientWithNick();
+        client.channels.push(channel);
+        channel.members.push(client);
     }
     return channel;
 }
 
+function createChannelList(numberOfChannel) {
+    if (numberOfChannel === undefined)
+        numberOfChannel = 10;
+
+    var clients = [];
+    for (var i = 0; i < numberOfChannel; i++) {
+        clients.push(createChannelWithClients());
+    }
+    return clients;
+}
+
 module.exports = {
     createChannelOnlyName: createChannelOnlyName,
-    createChannelWithClients: createChannelWithClients
+    createChannelWithClients: createChannelWithClients,
+    createChannelList: createChannelList
 };
