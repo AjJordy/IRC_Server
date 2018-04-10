@@ -29,8 +29,7 @@ net.createServer(function (socket) {
 
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
-    var args = data.toString().trim().split(" ");
-		handler.analyze(args, curr_Client, clients, channels);
+		handler.analyze(data, curr_Client, clients, channels);
 		console.log(data.toString().trim());
 	});
 

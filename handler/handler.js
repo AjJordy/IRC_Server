@@ -47,8 +47,9 @@ const COMMANDS = {
 
 var nickname = "Anonymous";
 
-exports.analyze = function (data, client, clients) {
+exports.analyze = function (data, client, clients, channels) {
   var message = String(data).trim();
+  var args = data.toString().trim().split(" ");
   if (args[0] === COMMANDS.HELP) help(socket);
   else if (args[0] === COMMANDS.NICK) nick(args, client, clients);
   else if (args[0] === COMMANDS.PASS) pass(args, client.socket);
