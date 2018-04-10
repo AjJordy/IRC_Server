@@ -1,4 +1,6 @@
 // Send a message to all clients
+var channels = [];
+
 exports.broadcast = function (message, sender, clients) {
   clients.forEach(function (client) {
     // Don't want to send it to sender
@@ -145,9 +147,32 @@ function oper(args,socket){
   socket.write("OPER command executed with sucess.\n");
 }
 
-function mode(args,socket){
-  //TODO
-  socket.write("MODE command executed with sucess.\n");
+function mode(args,client,clients){
+
+  if(args.length() < 2) {
+
+    client.socket.write("Need more params");
+
+  }
+  else {
+
+    if (args[2][0] == "+")
+      var addOrRemove = true;
+    else if (args[2][0] == "-")
+      var addOrRemove = false;
+    else
+      return ;
+
+    var modes = args[2].length();
+    if(modes < 2) {
+      client.socket.write("Need more params");
+      return;
+    }
+    else {
+      }
+      
+      
+
 }
 
 function service(args,socket){
