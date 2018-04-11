@@ -214,7 +214,7 @@ function who(args, client, clients){
     client.write("/who for all visible users:\n");
     for(i = 0; i < clients.length; i++){
       if(clients[i].visible)
-        client.write(clients.nick)
+        client.write(clients[i].nick)
     }
   }
   else if(args[1] && args[1] != 0){
@@ -228,14 +228,14 @@ function who(args, client, clients){
         client.write("/who for all operators matching mask''" + args[2] + "':\n'");
         for(i = 0; i < clients.length; i++){
           if(clients[i].visible && clients[i].isOp && (clients[i].nick.includes(args[2]) || clients[i].user.includes(args[2])))
-            client.write(clients.nick);
+            client.write(clients[i].nick);
         }
       }
       else{
         client.write("/who for all users matching mask''" + args[2] + "':\n'");
         for(i = 0; i < clients.length; i++){
           if(clients[i].visible && (clients[i].nick.includes(args[2]) || clients[i].user.includes(args[2])))
-            client.write(clients.nick);
+            client.write(clients[i].nick);
         }
       }
     }
