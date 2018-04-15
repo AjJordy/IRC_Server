@@ -273,8 +273,6 @@ function join(args, client, clients, channels) {
             found.members.push(client);
             client.channels.push(found);
         } else {
-          console.log("novo canal " + channelName + "\n");
-          console.log(found + "\n");
             found = channelObject.constructor(channelName);
             found.members.push(Object.assign({}, {isOp: true}, client));
             client.channels.push(found);
