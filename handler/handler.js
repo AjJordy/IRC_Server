@@ -69,7 +69,7 @@ exports.analyze = function (data, client, clients, channels) {
   else if (args[0] === COMMANDS.KICK) kick(args, client, target);
   else if (args[0] === COMMANDS.PRIVMSG) privmsg(args, client, clients, channels);
   else if (args[0] === COMMANDS.VERSION) version(client);
-  else client.socket.write("Command doesn't exist.");//handler.broadcast(data.toString().trim(), client, clients);
+  else client.socket.write("Command doesn't exist.\n");//handler.broadcast(data.toString().trim(), client, clients);
 };
 
 
@@ -127,32 +127,30 @@ function help(client){
 //  "DIE:  Parameters: [None]. An operator can use the DIE command to shutdown the server.\n"+
 //  "RESTART:  Parameters: [None]. An operator can use the restart command to force the server to restart itself.\n"+
 //  "SUMMON:  Parameters: <user> [ <target> [ <channel> ] ] The SUMMON command can be used to give users who are on a host running an IRC server a message asking them to please join IRC.\n"+
-  "USERS:  Parameters: [ <target> ] The USERS command returns a list of users logged into the server in a format similar to the UNIX commands who(1), rusers(1) and finger(1).\n"
+  "USERS:  Parameters: [ <target> ] The USERS command returns a list of users logged into the server in a format similar to the UNIX commands who(1), rusers(1) and finger(1).\n"+
 //  "WALLOPS:  Parameters: <Text to be sent> The WALLOPS command is used to send a message to all currently connected users who have set the ’w’ user mode for themselves.\n"+
 //  "USERHOST:  Parameters: <nickname> *( SPACE <nickname> ) The USERHOST command takes a list of up to 5 nicknames, each separated by a space character and returns a list of information about each nickname that it found. \n"+
 //  "ISON:  Parameters: <nickname> *( SPACE <nickname> ) The ISON command was implemented to provide a quick and efficient means to get a response about whether a given nickname was currently on IRC.\n"
+"\n\n"
   );
 }
 
 // Set the user's nickname
 function nick(args, client, clients){
   if(args.length < 2)
-    client.socket.write("ERR_NONICKNAMEGIVEN");
+    client.socket.write("ERR_NONICKNAMEGIVEN\n");
   else{
       var nick = args.slice(1);
-      console.log("valor do nick "+nick);
       // Look for all channels
       if (clients != null) {
           for (i = 0; i < clients.length; i++) {
               // Look for all members' name
-              console.log(clients[i].nick);
                   if (clients[i].nick == nick) {
-                      client.socket.write("ERR_NICKNAMEINUSE");
+                      client.socket.write("ERR_NICKNAMEINUSE\n");
                       return;
                   }
           }
           client.nick = nick;
-          console.log("nick no client" +client.nick);
           exports.broadcast(client.nick.toString() + " joined the chat\n", client, clients);
       }
   }
@@ -161,7 +159,7 @@ function nick(args, client, clients){
 // Set the user's password
 function pass(args, client) {
   if(args.length < 2)
-      client.socket.write("ERR_NEEDMOREPARAMS");
+      client.socket.write("ERR_NEEDMOREPARAMS\n");
   else
       client.pswd = args[1].toString();
 }
@@ -218,7 +216,7 @@ function who(args, client, clients){
     client.write("/who for all visible users:\n");
     for(i = 0; i < clients.length; i++){
       if(clients[i].visible)
-        client.write(clients[i].nick)
+        client.write(clients[i].nick+"\n")
     }
   }
   else if(args[1] && args[1] != 0){
@@ -232,14 +230,14 @@ function who(args, client, clients){
         client.write("/who for all operators matching mask''" + args[2] + "':\n'");
         for(i = 0; i < clients.length; i++){
           if(clients[i].visible && clients[i].isOp && (clients[i].nick.includes(args[2]) || clients[i].user.includes(args[2])))
-            client.write(clients[i].nick);
+            client.write(clients[i].nick+"\n");
         }
       }
       else{
         client.write("/who for all users matching mask''" + args[2] + "':\n'");
         for(i = 0; i < clients.length; i++){
           if(clients[i].visible && (clients[i].nick.includes(args[2]) || clients[i].user.includes(args[2])))
-            client.write(clients[i].nick);
+            client.write(clients[i].nick+"\n");
         }
       }
     }
@@ -331,7 +329,7 @@ function user(args,client, clients) {
       client.socket.write("This username already exists. Try another one\n\n");
     else {
       if(args[2].length > 1)
-        client.socket.write("Mode parameter need be 8 or less");
+        client.socket.write("Mode parameter need be 8 or less\n");
       else {
         client.userName = args[1];
         if(+args[2] & 4)
@@ -352,7 +350,7 @@ function user(args,client, clients) {
 // Enter with operator mode
 function oper(args, client) {
     if(args.length < 2){
-        client.socket.write("ERR_NEEDMOREPARAMS");
+        client.socket.write("ERR_NEEDMOREPARAMS\n");
     }else{
         if(args[1] == passOp)
             client.isOp = true;
@@ -384,5 +382,5 @@ function list(args, client, channels) {
 
 // Show the server's version
 function version(client) {
-    client.socket.write("IRC Server "+ ver);
+    client.socket.write("IRC Server "+ ver+"\n");
 }
