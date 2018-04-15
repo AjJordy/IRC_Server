@@ -11,15 +11,14 @@ var nickname = "Anonymous";
 exports.broadcast = function (message, sender, clients) {
     try {
         clients.forEach(function (client) {
-            // Don't want to send it to sender
-            if (client === sender) return;
-            client.socket.write(sender.nick + ": " + message + "\n");
+            if (client.nick != sender.nick) {
+                client.socket.write(sender.nick + ": " + message + "\n");
+            }
         });
     } catch (e) {
         console.log("erro", e);
     }
-
-}
+};
 
 const COMMANDS = {
     HELP: 'HELP',
@@ -58,7 +57,7 @@ exports.analyze = function (data, client, clients, channels) {
     else if (args[0] === COMMANDS.MODE) mode(args, client);
     else if (args[0] === COMMANDS.SERVICE) service(args, client);
     else if (args[0] === COMMANDS.QUIT) quit(args, client);
-    else if (args[0] === COMMANDS.JOIN) join(args, client);
+    else if (args[0] === COMMANDS.JOIN) join(args, client, clients, channels);
     else if (args[0] === COMMANDS.PART) part(args, client);
     else if (args[0] === COMMANDS.TOPIC) topic(args, client);
     else if (args[0] === COMMANDS.NAMES) names(args, client, channels);
@@ -137,7 +136,7 @@ function nick(args, client, clients) {
     if (args.length < 2)
         client.socket.write("ERR_NONICKNAMEGIVEN\n");
     else {
-        var nick = [].concat(args).slice(1)+'';
+        var nick = [].concat(args).slice(1) + '';
         // Look for all channels
         var found = clients.find(function (client) {
             return client.nick === nick;
@@ -253,29 +252,33 @@ function remove(client) {
 }
 
 // Client enter in a channel
-function join(args, client, clients, nicks, channels) {
+function join(args, client, clients, channels) {
     var socket = client.socket;
     if (!args[1]) {
         socket.write("ERROR: invalid request, try /join <#channel>\n");
         return;
     } else {
-        var channelName = args.slice(1);
-        var chan = false;
-        for (i = 0; i < channels.length; i++) {
-            //checa se o canal existe
-            if (channels[i].name == channelName) {
-                chan = true;
-                client.channels.push(channels[i]);
-                channels[i].members.push(client);
-                server.channels = channels;
-                client.socket.write("You joined " + chn.name + ".\n");
+        var channelName = [].concat(args).slice(1) + '';
+        var found = channels.find(function (channel) {
+            return channelName === channel.name;
+        });
+        //TODO verificar tamanho do canal, numero de canais do participante e o mode do usuário corretamente
+        if (found !== undefined) {
+            var clientChannel = client.channels.find(function (channel) {
+                return channelName === channel.name
+            });
+            if (clientChannel !== undefined) {
                 return;
             }
+            found.members.push(client);
+            client.channels.push(found);
+        } else {
+            found = channelObject.constructor(channelName);
+            found.members.push(Object.assign({}, {isOp: true}, client));
+            client.channels.push(found);
         }
-        if (chan = !true) {
-            channelObject = clientEntity.constructor(channelName);
-            channelObject.members.push(client);
-        }
+        client.socket.write("You joined " + channelName + ".\n");
+        exports.broadcast(client.nick.toString() + " joined the chat", client, found.members);
     }
 }
 
