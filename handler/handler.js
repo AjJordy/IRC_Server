@@ -359,6 +359,143 @@ function oper(args, client) {
 
 }
 
+function mode(args, client, clients, channels) {
+    //TODO
+    if (args.length < 3) {
+          client.socket.write("Need more params \n");
+          return;
+        }
+    else {
+          var channelIndex = channels.findIndex(i.name === args[1]);
+
+          if(channelIndex == -1) {
+                  client.socket.write("No such channel\n");
+                  return;
+                }
+          else {
+                  if (args[2][0] == "+") {
+                            var flag = true;
+                          }
+                  else if(args[2][0] == "-") {
+                            var flag = false;
+                          }
+                  else {
+                            client.socket.write("Unknow flag\n");
+                            return;
+                          }
+
+                  if(args[2].length() == 2 & flag) {
+                            if(args[2][1] == 'l') {
+                                          channels[channelIndex].limit = +args[3];
+
+                                        client.socket.write("Channel limit updated to " + args[3] + "\n");
+                                        return;
+                                      }
+                          }
+
+                  if(args[2].indexOf('o') != -1) {
+                                        if(flag && (channels[channelIndex].operators.indexOf(client.nick) == -1))
+                                          channels[channelIndex].operators.push(client.nick);
+                                        else {
+                                                    var clientIndex = channels[channelIndex].operators.findIndex(n === client.nick);
+                                                    if(clientIndex > 0)
+                                                                    channels[channelIndex].operators.splice(clientIndex, 1);
+                                                  }
+
+                            client.socket.write("MODE command executed\n");
+                            return;
+                          }
+
+                  if(args[2].indexOf('p') != -1) {
+                            if(flag)
+                                        channels[channelIndex].private = true;
+                            else
+                                        channels[channelIndex].private = false;
+                          }
+
+                  if(args[2].indexOf('s') != -1) {
+                            if(flag)
+                                        channels[channelIndex].secret = true;
+                            else
+                                        channels[channelIndex].secret = false;
+                          }
+
+                  if(args[2].indexOf('i') != -1) {
+                            if(flag)
+                                        channels[channelIndex].inviteOnly = true;
+                            else
+                                        channels[channelIndex].inviteOnly = false;
+                          }
+
+                  if(args[2].indexOf('t') != -1) {
+                            if(flag)
+                                        channels[channelIndex].topicOnlyOp = true;
+                            else
+                                        channels[channelIndex].topicOnlyOp = false;
+                          }
+
+                  if(args[2].indexOf('n') != -1) {
+                            if(flag)
+                                        channels[channelIndex].outside = true;
+                            else
+                                        channels[channelIndex].outside = false;
+                          }
+
+                  if(args[2].indexOf('m') != -1) {
+                            if(flag)
+                                        channels[channelIndex].moderated = true;
+                            else
+                                        channels[channelIndex].moderated = false;
+                          }
+
+                  if(args[2].indexOf('v') != -1) {
+                            if(flag && (channels[channelIndex].voice.indexOf(args[3]) == -1))
+                                        channels[channelIndex].voice.push(args[3]);
+                            else {
+                                        var clientIndex = channels[channelIndex].voice.findIndex(n === args[3]);
+                                        if(clientIndex > 0)
+                                                      channels[channelIndex].voice.splice(clientIndex, 1);
+                                      }
+
+                            client.socket.write("MODE command executed\n");
+                            return;
+                          }
+
+                  if(args[2].indexOf('b') != -1) {
+                            if(args.length < 4)
+                                        client.socket.write("Current ban masks: " + channels[channelIndex].banMask + " \n");
+                            else {
+                                        if(flag)
+                                                      channels[channelIndex].banMask = args[3];
+                                        else
+                                                      channels[channelIndex].banMask = "";
+                                      }
+
+                            client.socket.write("MODE command executed\n");
+                            return;
+                          }
+
+                  if(args[2].indexOf('k') != -1) {
+                            if(flag) {
+                                        if(args.length < 4) {
+                                                      client.socket.write("Need more params\n");
+                                                      return;
+                                                    }
+                                        else {
+                                                      channels[channelIndex].key = args[3];
+                                                      client.socket.write("Channel password updated!\n");
+                                                    }
+                                      }
+                            else
+                                        channels[channelIndex].key = "";
+
+                            client.socket.write("MODE command executed\n");
+                          }
+                }
+        }
+  }
+
+
 // List the user's name of the channel
 function names(args, client, channels) {
     var channelName = args.slice(1);
