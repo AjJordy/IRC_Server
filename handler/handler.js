@@ -49,25 +49,25 @@ exports.analyze = function (data, client, clients, channels) {
   var message = String(data).trim();
   var args = data.toString().trim().split(" ");
   if (args[0] === COMMANDS.HELP) help(socket);
-  else if (args[0] === COMMANDS.NICK) nick(args, client.socket, clients);
-  else if (args[0] === COMMANDS.PASS) pass(args, client.socket);
-  else if (args[0] === COMMANDS.USER) user(args, client.socket, clients);
+  else if (args[0] === COMMANDS.NICK) nick(args, client, clients);
+  else if (args[0] === COMMANDS.PASS) pass(args, client);
+  else if (args[0] === COMMANDS.USER) user(args, client, clients);
   else if (args[0] === COMMANDS.AWAY) away(args, client);
   else if (args[0] === COMMANDS.BACK) back(args, client);
   else if (args[0] === COMMANDS.WHO)  who(args, client, clients);
-  else if (args[0] === COMMANDS.OPER) oper(args, client.socket);
-  else if (args[0] === COMMANDS.MODE) mode(args, client.socket);
-  else if (args[0] === COMMANDS.SERVICE) service(args, client.socket);
-  else if (args[0] === COMMANDS.QUIT) quit(args, client.socket);
-  else if (args[0] === COMMANDS.JOIN) join(args, client.socket);
-  else if (args[0] === COMMANDS.PART) part(args, client.socket);
-  else if (args[0] === COMMANDS.TOPIC) topic(args, client.socket);
+  else if (args[0] === COMMANDS.OPER) oper(args, client);
+  else if (args[0] === COMMANDS.MODE) mode(args, client);
+  else if (args[0] === COMMANDS.SERVICE) service(args, client);
+  else if (args[0] === COMMANDS.QUIT) quit(args, client);
+  else if (args[0] === COMMANDS.JOIN) join(args, client);
+  else if (args[0] === COMMANDS.PART) part(args, client);
+  else if (args[0] === COMMANDS.TOPIC) topic(args, client);
   else if (args[0] === COMMANDS.NAMES) names(args, client,channels);
-  else if (args[0] === COMMANDS.LIST) list(args, client.socket);
-  else if (args[0] === COMMANDS.INVITE) invite(args, client.socket);
-  else if (args[0] === COMMANDS.KICK) kick(args, client.socket, target);
+  else if (args[0] === COMMANDS.LIST) list(args, client);
+  else if (args[0] === COMMANDS.INVITE) invite(args, client);
+  else if (args[0] === COMMANDS.KICK) kick(args, client, target);
   else if (args[0] === COMMANDS.PRIVMSG) privmsg(args, client, clients, channels);
-  else if (args[0] === COMMANDS.VERSION) version(args);
+  else if (args[0] === COMMANDS.VERSION) version(client);
   else client.socket.write("Command doesn't exist.");//handler.broadcast(data.toString().trim(), client, clients);
 };
 
@@ -197,9 +197,8 @@ function away(args, client){
 
 // User came back to keyboard
 function back(args, client){
-  var socket = client.socket;
   if(args[1]){
-    socket.write("ERROR: invalid request, try /back\n");
+    client.socket.write("ERROR: invalid request, try /back\n");
     return;
   } else{
     client.away = false;
