@@ -52,25 +52,25 @@ exports.analyze = function (data, client, clients, channels) {
   var message = String(data).trim();
   var args = data.toString().trim().split(" ");
   if (args[0] === COMMANDS.HELP) help(client);
-  else if (args[0] === COMMANDS.NICK) nick(args, client.socket, clients);
-  else if (args[0] === COMMANDS.PASS) pass(args, client.socket);
-  else if (args[0] === COMMANDS.USER) user(args, client.socket, clients);
+  else if (args[0] === COMMANDS.NICK) nick(args, client, clients);
+  else if (args[0] === COMMANDS.PASS) pass(args, client);
+  else if (args[0] === COMMANDS.USER) user(args, client, clients);
   else if (args[0] === COMMANDS.AWAY) away(args, client);
   else if (args[0] === COMMANDS.BACK) back(args, client);
   else if (args[0] === COMMANDS.WHO)  who(args, client, clients);
-  else if (args[0] === COMMANDS.OPER) oper(args, client.socket);
-  else if (args[0] === COMMANDS.MODE) mode(args, client.socket);
-  else if (args[0] === COMMANDS.SERVICE) service(args, client.socket);
-  else if (args[0] === COMMANDS.QUIT) quit(args, client.socket);
-  else if (args[0] === COMMANDS.JOIN) join(args, client.socket);
-  else if (args[0] === COMMANDS.PART) part(args, client.socket);
-  else if (args[0] === COMMANDS.TOPIC) topic(args, client.socket);
+  else if (args[0] === COMMANDS.OPER) oper(args, client);
+  else if (args[0] === COMMANDS.MODE) mode(args, client);
+  else if (args[0] === COMMANDS.SERVICE) service(args, client);
+  else if (args[0] === COMMANDS.QUIT) quit(args, client);
+  else if (args[0] === COMMANDS.JOIN) join(args, client);
+  else if (args[0] === COMMANDS.PART) part(args, client);
+  else if (args[0] === COMMANDS.TOPIC) topic(args, client);
   else if (args[0] === COMMANDS.NAMES) names(args, client,channels);
-  else if (args[0] === COMMANDS.LIST) list(args, client.socket);
-  else if (args[0] === COMMANDS.INVITE) invite(args, client.socket);
-  else if (args[0] === COMMANDS.KICK) kick(args, client.socket, target);
+  else if (args[0] === COMMANDS.LIST) list(args, client);
+  else if (args[0] === COMMANDS.INVITE) invite(args, client);
+  else if (args[0] === COMMANDS.KICK) kick(args, client, target);
   else if (args[0] === COMMANDS.PRIVMSG) privmsg(args, client, clients, channels);
-  else if (args[0] === COMMANDS.VERSION) version(args);
+  else if (args[0] === COMMANDS.VERSION) version(client);
   else client.socket.write("Command doesn't exist.");//handler.broadcast(data.toString().trim(), client, clients);
 
 };
@@ -138,22 +138,25 @@ function help(client){
 }
 
 // Set the user's nickname
-function nick(args,client, clients,channels){
+function nick(args, client, clients){
   if(args.length < 2)
     client.socket.write("ERR_NONICKNAMEGIVEN");
   else{
       var nick = args.slice(1);
+      console.log("valor do nick "+nick);
       // Look for all channels
-      for (i = 0; i < channels.length; i++) {
-          // Look for all members' name
-          for(j = 0;j < channels[i].members.length;j++){
-              if (channels[i].members[j].name == nick) {
-                  client.socket.write("ERR_NICKNAMEINUSE");
-              }else{
-                  client.nick = nick;
-                  broadcast(client.nick.toString() + " joined the chat\n", client, clients);
-              }
+      if (clients != null) {
+          for (i = 0; i < clients.length; i++) {
+              // Look for all members' name
+              console.log(clients[i].nick);
+                  if (clients[i].nick == nick) {
+                      client.socket.write("ERR_NICKNAMEINUSE");
+                      return;
+                  }
           }
+          client.nick = nick;
+          console.log("nick no client" +client.nick);
+          exports.broadcast(client.nick.toString() + " joined the chat\n", client, clients);
       }
   }
 }
