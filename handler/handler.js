@@ -39,7 +39,6 @@ const COMMANDS = {
     PRIVMSG: 'PRIVMSG',
     VERSION: 'VERSION',
     WHO: 'WHO',
-    BACK: 'BACK',
     AWAY: 'AWAY'
 };
 
@@ -51,7 +50,6 @@ exports.analyze = function (data, client, clients, channels) {
     else if (args[0] === COMMANDS.PASS) pass(args, client);
     else if (args[0] === COMMANDS.USER) user(args, client, clients);
     else if (args[0] === COMMANDS.AWAY) away(args, client);
-    else if (args[0] === COMMANDS.BACK) back(args, client);
     else if (args[0] === COMMANDS.WHO) who(args, client, clients);
     else if (args[0] === COMMANDS.OPER) oper(args, client);
     else if (args[0] === COMMANDS.MODE) mode(args, client);
@@ -179,28 +177,15 @@ function quit(args, client, clients) {
 
 // User is away from keyboard
 function away(args, client) {
-    var socket = client.socket;
     if (!args[1]) {
-        socket.write("ERROR: invalid request, try /away <message>\n");
+        client.awayMessage = ("");
+        client.socket.write("Your status is set as UNAWAY: \n");
         return;
     }
     else {
         var msg = args.slice(1);
-        client.away = true;
         client.awayMessage = msg.join(" ");
-        socket.write("Your status is set as AWAY: " + client.awayMsg + "\n");
-    }
-}
-
-// User came back to keyboard
-function back(args, client) {
-    if (args[1]) {
-        client.socket.write("ERROR: invalid request, try /back\n");
-        return;
-    } else {
-        client.away = false;
-        client.awayMessage = null;
-        socket.write("Your status is no longer set as AWAY.\n");
+        socket.write("Your status is set as AWAY: " + client.awayMessage + "\n");
     }
 }
 

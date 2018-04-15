@@ -1,7 +1,6 @@
  exports.constructor = function(socket){
  	var objClient = new Object();
  	objClient.socket = socket;
- 	objClient.away = false;
  	objClient.nick = null;
  	objClient.awayMessage = "";
  	objClient.channels = [];
