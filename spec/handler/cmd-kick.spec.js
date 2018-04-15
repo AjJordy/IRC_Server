@@ -31,13 +31,11 @@ describe("Deve testar a kick", function () {
         }).length);
 
         var esperadoAlvo = messageClient.replace('[CHANNEL_NAME]', canal.name);
-        console.log(esperadoAlvo);
         expect(esperadoAlvo).toBe(clienteAlvo.socket.getRespostas()[0]);
 
         //Assinantes do canal menos alvo
         var esperadoCanal = messageChannelWithReason.replace('[CLIENT_NAME]', clienteAlvo.nick);
         esperadoCanal = esperadoCanal.replace('[REASON]', reason);
-        console.log(esperadoCanal);
         clientesDentroDoCanalForaAlvo.forEach(function (cliente) {
             expect(esperadoCanal).toBe(cliente.socket.getRespostas()[0]);
         });
