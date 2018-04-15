@@ -28,6 +28,34 @@ describe("Deve testar a mensagem privada", function () {
         });
     });
 
+    it("Enviar mensagem privada para 1 cliente e receber away message", function () {
+        //PRIVMSG [nickname] : [message]
+        var clients = clientFactory.createClientList();
+        var clienteAtivo = clients[0];
+        var clienteAmigo = clients[1];
+        var outros = [].concat(clients).splice(2);
+
+        var awayMessage = faker.lorem.sentence();
+        clienteAmigo.awayMessage = awayMessage;
+
+        var mensagem = faker.lorem.sentence();
+        var comando = 'PRIVMSG ' + clienteAmigo.nick + ' :' + mensagem;
+        handler.analyze(comando, clienteAtivo, clients, []);
+
+        var esperado = "Private message from " + clienteAtivo.nick + " " + mensagem + "\n";
+        expect(esperado).toBe(clienteAmigo.socket.getRespostas()[0]);
+
+        //Deve receber o awayMessage
+        var esperadoAwayMessage = "Private message from " + clienteAmigo.nick + " " + awayMessage + "\n";
+        expect(esperadoAwayMessage).toBe(clienteAtivo.socket.getRespostas()[0]);
+
+        //Nenhum deles deve receber uma resposta
+        outros.forEach(function (cliente) {
+            expect(0).toBe(cliente.socket.getRespostas().length);
+        });
+    });
+
+
     it("Enviar mensagem privada para mais de 1 cliente", function () {
         //PRIVMSG [nickname], [nickname2] : [message]
         var clients = clientFactory.createClientList();

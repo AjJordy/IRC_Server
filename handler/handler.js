@@ -137,7 +137,7 @@ function nick(args, client, clients) {
     if (args.length < 2)
         client.socket.write("ERR_NONICKNAMEGIVEN\n");
     else {
-        var nick = [].concat(args).slice(1)+'';
+        var nick = [].concat(args).slice(1) + '';
         // Look for all channels
         var found = clients.find(function (client) {
             return client.nick === nick;
@@ -290,22 +290,24 @@ function privmsg(args, client, clients, channels) {
         return;
     }
     var destinatarios = destinatariosFind[1].replace(/\s/g, '').split(',');
-    var writeMessage = function (clientDest) {
-        var msg = comando.substr(comando.indexOf(':') + 1);
-        clientDest.socket.write("Private message from " + client.nick + " " + msg + "\n");
+    var writeMessage = function (clientOrigem, clientDest, msg) {
+        clientDest.socket.write("Private message from " + clientOrigem.nick + " " + msg + "\n");
     }.bind(this);
 
-
+    var msg = comando.substr(comando.indexOf(':') + 1);
     clients.forEach(function (clientDest) {
         if (destinatarios.indexOf(clientDest.nick) !== -1) {
-            writeMessage(clientDest);
+            writeMessage(client, clientDest, msg);
+            if (clientDest.awayMessage.length > 0) {
+                writeMessage(clientDest, client, clientDest.awayMessage);
+            }
         }
     });
 
     channels.forEach(function (channelDest) {
         if (destinatarios.indexOf(channelDest.name) !== -1) {
             channelDest.members.forEach(function (clientDest) {
-                writeMessage(clientDest);
+                writeMessage(client, clientDest, msg);
             });
         }
     });
