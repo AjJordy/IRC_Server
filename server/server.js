@@ -42,5 +42,7 @@ net.createServer(function (socket) {
 
 }).listen(5000);
 
+exports.clients = clients;
+
 // Put a friendly message on the terminal of the server.
 console.log("Chat server running at port 5000\n");

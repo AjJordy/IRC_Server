@@ -1,6 +1,7 @@
 // Load the TCP Library
 net = require('net');
 server = require('../server/server.js');
+channelObject = require('../entity/entity_channel.js');
 
 passOp = "admin";
 ver = "1.0";
@@ -74,8 +75,8 @@ exports.analyze = function (data, client, clients, channels) {
 
 
 // List all commands available
-function help(socket){
-  socket.write("\nCommands of connection registration:\n"+
+function help(client){
+  client.socket.write("\nCommands of connection registration:\n"+
   "NICK: Parameters: <nickname>. To set your nickname.\n"+
   "PASS: Parameters: <password>. To set your password.\n"+
   "USER: Parameters: <user> <mode> <unused> <realname>. Used at the beginning of connection to specify the username.\n"+
@@ -134,22 +135,25 @@ function help(socket){
 }
 
 // Set the user's nickname
-function nick(args,client, clients,channels){
+function nick(args, client, clients){
   if(args.length < 2)
     client.socket.write("ERR_NONICKNAMEGIVEN");
   else{
       var nick = args.slice(1);
+      console.log("valor do nick "+nick);
       // Look for all channels
-      for (i = 0; i < channels.length; i++) {
-          // Look for all members' name
-          for(j = 0;j < channels[i].members.length;j++){
-              if (channels[i].members[j].name == nick) {
-                  client.socket.write("ERR_NICKNAMEINUSE");
-              }else{
-                  client.nick = nick;
-                  broadcast(client.nick.toString() + " joined the chat\n", client, clients);
-              }
+      if (clients != null) {
+          for (i = 0; i < clients.length; i++) {
+              // Look for all members' name
+              console.log(clients[i].nick);
+                  if (clients[i].nick == nick) {
+                      client.socket.write("ERR_NICKNAMEINUSE");
+                      return;
+                  }
           }
+          client.nick = nick;
+          console.log("nick no client" +client.nick);
+          exports.broadcast(client.nick.toString() + " joined the chat\n", client, clients);
       }
   }
 }
@@ -214,7 +218,7 @@ function who(args, client, clients){
     client.write("/who for all visible users:\n");
     for(i = 0; i < clients.length; i++){
       if(clients[i].visible)
-        client.write(clients.nick)
+        client.write(clients[i].nick)
     }
   }
   else if(args[1] && args[1] != 0){
@@ -228,14 +232,14 @@ function who(args, client, clients){
         client.write("/who for all operators matching mask''" + args[2] + "':\n'");
         for(i = 0; i < clients.length; i++){
           if(clients[i].visible && clients[i].isOp && (clients[i].nick.includes(args[2]) || clients[i].user.includes(args[2])))
-            client.write(clients.nick);
+            client.write(clients[i].nick);
         }
       }
       else{
         client.write("/who for all users matching mask''" + args[2] + "':\n'");
         for(i = 0; i < clients.length; i++){
           if(clients[i].visible && (clients[i].nick.includes(args[2]) || clients[i].user.includes(args[2])))
-            client.write(clients.nick);
+            client.write(clients[i].nick);
         }
       }
     }
@@ -262,16 +266,22 @@ function join(args, client, clients, nicks, channels) {
         return;
     } else {
         var channelName = args.slice(1);
+        var chan = false;
         for (i = 0; i < channels.length; i++) {
             //checa se o canal existe
             if (channels[i].name == channelName) {
-                var chn = channels[i];
-                client.channels.push(chn);
+				chan = true;
+                client.channels.push(channels[i]);
                 channels[i].members.push(client);
                 server.channels = channels;
                 client.socket.write("You joined " + chn.name + ".\n");
+                return;
             }
         }
+		if(chan=!true){
+			channelObject = clientEntity.constructor(channelName);
+			channelObject.members.push(client);
+		}
     }
 }
 
