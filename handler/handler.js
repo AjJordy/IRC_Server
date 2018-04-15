@@ -261,6 +261,7 @@ function join(args, client, clients, channels) {
             found = channelObject.constructor(channelName);
             found.members.push(Object.assign({}, {isOp: true}, client));
             client.channels.push(found);
+          channels.push(found);
         }
         client.socket.write("You joined " + channelName + ".\n");
         exports.broadcast(client.nick.toString() + " joined the chat", client, found.members);
