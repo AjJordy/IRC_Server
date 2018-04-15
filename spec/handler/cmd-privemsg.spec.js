@@ -4,34 +4,12 @@ clientFactory = require('../factory/client-factory');
 channelFactory = require('../factory/channel-factory');
 handler = require('../../handler/handler.js');
 
-var createClientList = function (numberOfClients) {
-    if (numberOfClients === undefined)
-        numberOfClients = 10;
-
-    var clients = [];
-    for (var i = 0; i < numberOfClients; i++) {
-        clients.push(clientFactory.createClientWithNick());
-    }
-    return clients;
-}.bind(this);
-
-var createChannelList = function (numberOfChannel) {
-    if (numberOfChannel === undefined)
-        numberOfChannel = 10;
-
-    var clients = [];
-    for (var i = 0; i < numberOfChannel; i++) {
-        clients.push(channelFactory.createChannelWithClients());
-    }
-    return clients;
-}.bind(this);
-
 describe("Deve testar a mensagem privada", function () {
 
 
     it("Enviar mensagem privada para 1 cliente", function () {
         //PRIVMSG [nickname] : [message]
-        var clients = createClientList();
+        var clients = clientFactory.createClientList();
         var clienteAtivo = clients[0];
         var clienteAmigo = clients[1];
         var outros = [].concat(clients).splice(2);
@@ -52,7 +30,7 @@ describe("Deve testar a mensagem privada", function () {
 
     it("Enviar mensagem privada para mais de 1 cliente", function () {
         //PRIVMSG [nickname], [nickname2] : [message]
-        var clients = createClientList();
+        var clients = clientFactory.createClientList();
         var clienteAtivo = clients[0];
 
         var numeroRecebedores = faker.random.number(clients.length - 2); // -2 (1 cliente atual, minimo 1 cliente sem receber)
@@ -110,8 +88,8 @@ describe("Deve testar a mensagem privada", function () {
 
     it("Enviar mensagem privada para canais e clientes", function () {
         //PRIVMSG [nickname], [nickname2] : [message]
-        var clients = createClientList();
-        var channels = createChannelList();
+        var clients = clientFactory.createClientList();
+        var channels = channelFactory.createChannelList();
 
         var clienteAtivo = clients[0];
 

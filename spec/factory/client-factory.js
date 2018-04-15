@@ -12,7 +12,19 @@ function createClientWithNick() {
     return client;
 }
 
+function createClientList(numberOfClients) {
+    if (numberOfClients === undefined)
+        numberOfClients = 10;
+
+    var clients = [];
+    for (var i = 0; i < numberOfClients; i++) {
+        clients.push(createClientWithNick());
+    }
+    return clients;
+}
+
 module.exports = {
     createClientOnlyFakeSocket: createClientOnlyFakeSocket,
-    createClientWithNick: createClientWithNick
+    createClientWithNick: createClientWithNick,
+    createClientList: createClientList
 };
