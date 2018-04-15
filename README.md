@@ -1,4 +1,4 @@
-﻿## Universidade Federal de Goiás
+## Universidade Federal de Goiás
 
 # Projeto 1 do Grupo 2
 
@@ -22,8 +22,34 @@
 
 **Bate-papo entre usuarios em diversos canais.**
 
+## Manual do usuário
 
-## Rodar Testes do servidor
+### Funções suportadas 
+
+* HELP
+* NICK
+* PASS
+* USER
+* OPER
+* MODE
+* SERVICE
+* QUIT
+* JOIN
+* PART
+* TOPIC
+* NAMES
+* LIST
+* INVITE
+* KICK
+* PRIVMSG
+* VERSION
+* WHO
+* BACK
+* AWAY
+
+## Manual do desenvolvedor
+
+# Rodar Testes do servidor
 
 Em nosso projeto utilizamos o *jasmine (https://jasmine.github.io)*  para testes unitários.
 
