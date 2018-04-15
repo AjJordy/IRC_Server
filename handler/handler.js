@@ -4,6 +4,7 @@ server = require('../server/server.js');
 
 passOp = "admin";
 ver = "1.0";
+var nickname = "Anonymous";
 
 // Send a message to all clients
 exports.broadcast = function(message, sender, clients) {
@@ -44,9 +45,6 @@ const COMMANDS = {
 	AWAY: 'AWAY'
 };
 
-
-var nickname = "Anonymous";
-
 exports.analyze = function (data, client, clients, channels) {
   var message = String(data).trim();
   var args = data.toString().trim().split(" ");
@@ -71,7 +69,6 @@ exports.analyze = function (data, client, clients, channels) {
   else if (args[0] === COMMANDS.PRIVMSG) privmsg(args, client, clients, channels);
   else if (args[0] === COMMANDS.VERSION) version(args);
   else client.socket.write("Command doesn't exist.");//handler.broadcast(data.toString().trim(), client, clients);
-
 };
 
 
@@ -97,42 +94,42 @@ function help(socket){
   "\nCommands of Channel operations:\n\n"+
   "JOIN: Parameters: ( <channel> *( \",\" <channel> ) [ <key> *( \",\" <key> ) ] ) / \"0\" To enter in a channel.\n"+
   "PART:  Parameters: <channel> *( \",\" <channel> ) [ <Part Message> ]. Causes the user sending the message to be removed from the list of active members\n"+
-  "TOPIC: Parameters: <channel> [ <topic> ]. This is used to change or view the topic of a channel.\n"+
+//  "TOPIC: Parameters: <channel> [ <topic> ]. This is used to change or view the topic of a channel.\n"+
   "NAMES: Parameters: [ <channel> \*( \",\" <channel> ) [ <target> ] ]. A user can list all nicknames that are visible to him.\n"+
   "LIST: Parameters: [ <channel> *( \",\" <channel> ) [ <target> ] ]. The list command is used to list channels and their topics.\n"+
   "INVITE: Parameters: <nickname> <channel>. This is used to invite a user to a channel.\n"+
   "KICK: Parameters: <channel> *( \",\" <channel> ) <user> *( \",\" <user> ) [<comment>]. This is used to request the forced removal of a user from a channel.\n"+
   "PRIVMSG: Parameters: <msgtarget> <text to be sent>. This is used to send private messages between users.\n"+
-  "NOTICE:  Parameters: <msgtarget> <text>. This is used similarly to PRIVMSG. The difference between NOTICE and PRIVMSG is that automatic replies MUST NEVER be sent in response to a NOTICE message.\n" +
+//  "NOTICE:  Parameters: <msgtarget> <text>. This is used similarly to PRIVMSG. The difference between NOTICE and PRIVMSG is that automatic replies MUST NEVER be sent in response to a NOTICE message.\n" +
   "\nServer queries and commands.\n\n"+
-  "MOTD: Parameters: [ <target> ]. This is used to get the Message Of The Day of the given server, or current server if <target> is omitted.\n"+
-  "LUSERS:  Parameters: [ <mask> [ <target> ] ]. The LUSERS command is used to get statistics about the size of the IRC network.\n"+
+//  "MOTD: Parameters: [ <target> ]. This is used to get the Message Of The Day of the given server, or current server if <target> is omitted.\n"+
+//  "LUSERS:  Parameters: [ <mask> [ <target> ] ]. The LUSERS command is used to get statistics about the size of the IRC network.\n"+
   "VERSION:  Parameters: [ <target> ]. This is used to query the version of the server program.\n"+
-  "STATS:  Parameters: [ <query> [ <target> ] ]. The stats command is used to query statistics of certain server.\n"+
-  "LINKS:   Parameters: [ [ <remote server> ] <server mask> ]. A user can list all servernames, which are known by the server answering the query.\n"+
-  "TIME:  Parameters: [ <target> ]. The time command is used to query local time from the specified server.\n"+
-  "CONNECT:  Parameters: <target server> <port> [ <remote server> ]. The CONNECT command can be used to request a server to try to establish a new connection to another server immediately.\n"+
-  "TRACE: Parameters: [ <target> ] .Command is used to find the route to specific server and information about its peers.\n"+
-  "ADMIN:  Parameters: [ <target> ].  The admin command is used to find information about the administrator of the given server, or current server if <target> parameter is omitted.\n"+
-  "INFO: Parameters: [ <target> ]. The INFO command is REQUIRED to return information describing the server: its version, when it was compiled, the patchlevel, when it was started, and any other miscellaneous information which may be considered to be relevant.\n"+
+//  "STATS:  Parameters: [ <query> [ <target> ] ]. The stats command is used to query statistics of certain server.\n"+
+//  "LINKS:   Parameters: [ [ <remote server> ] <server mask> ]. A user can list all servernames, which are known by the server answering the query.\n"+
+//  "TIME:  Parameters: [ <target> ]. The time command is used to query local time from the specified server.\n"+
+//  "CONNECT:  Parameters: <target server> <port> [ <remote server> ]. The CONNECT command can be used to request a server to try to establish a new connection to another server immediately.\n"+
+//  "TRACE: Parameters: [ <target> ] .Command is used to find the route to specific server and information about its peers.\n"+
+//  "ADMIN:  Parameters: [ <target> ].  The admin command is used to find information about the administrator of the given server, or current server if <target> parameter is omitted.\n"+
+//  "INFO: Parameters: [ <target> ]. The INFO command is REQUIRED to return information describing the server: its version, when it was compiled, the patchlevel, when it was started, and any other miscellaneous information which may be considered to be relevant.\n"+
   "SERVLIST:  Parameters: [ <mask> [ <type> ] ]. The SERVLIST command is used to list services currently connected to the network and visible to the user issuing the command.\n"+
-  "SQUERY: Parameters: <servicename> <text> The SQUERY command is used similarly to PRIVMSG. The only difference is that the recipient MUST be a service. This is the only way for a text message to be delivered to a service.\n"+
+//  "SQUERY: Parameters: <servicename> <text> The SQUERY command is used similarly to PRIVMSG. The only difference is that the recipient MUST be a service. This is the only way for a text message to be delivered to a service.\n"+
   "WHO: Parameters: [ <mask> [ \"o\" ] ]. The WHO command is used by a client to generate a query which returns a list of information which ’matches’ the <mask> parameter given by the client.\n"+
-  "WHOIS: Parameters: [ <target> ] <mask> *( \",\" <mask> ) This command is used to query information about particular user.\n"+
-  "WHOWAS: Parameters: <nickname> *( \",\" <nickname> ) [ <count> [ <target> ] ]. Whowas asks for information about a nickname which no longer exists.\n"+
-  "KILL: Parameters: <nickname> <comment> The KILL command is used to cause a client-server connection to be closed by the server which has the actual connection.\n"+
-  "PING : Parameters: <server1> [ <server2> ] The PING command is used to test the presence of an active client or server at the other end of the connection. \n"+
-  "PONG: Parameters: <server> [ <server2> ] PONG message is a reply to ping message.\n"+
-  " ERROR: Parameters: <error message> The ERROR command is for use by servers when reporting a serious or fatal error to its peers.\n"+
+//  "WHOIS: Parameters: [ <target> ] <mask> *( \",\" <mask> ) This command is used to query information about particular user.\n"+
+//  "WHOWAS: Parameters: <nickname> *( \",\" <nickname> ) [ <count> [ <target> ] ]. Whowas asks for information about a nickname which no longer exists.\n"+
+//  "KILL: Parameters: <nickname> <comment> The KILL command is used to cause a client-server connection to be closed by the server which has the actual connection.\n"+
+//  "PING : Parameters: <server1> [ <server2> ] The PING command is used to test the presence of an active client or server at the other end of the connection. \n"+
+//  "PONG: Parameters: <server> [ <server2> ] PONG message is a reply to ping message.\n"+
+//  " ERROR: Parameters: <error message> The ERROR command is for use by servers when reporting a serious or fatal error to its peers.\n"+
   "AWAY: Parameters: [ <text> ] With the AWAY command, clients can set an automatic reply string for any PRIVMSG commands directed at them (not to a channel they are on).\n"+
-  "REHASH:  Parameters: [None]. The rehash command is an administrative command which can be used by an operator to force the server to re-read and process its configuration file.\n"+
-  "DIE:  Parameters: [None]. An operator can use the DIE command to shutdown the server.\n"+
-  "RESTART:  Parameters: [None]. An operator can use the restart command to force the server to restart itself.\n"+
-  "SUMMON:  Parameters: <user> [ <target> [ <channel> ] ] The SUMMON command can be used to give users who are on a host running an IRC server a message asking them to please join IRC.\n"+
-  "USERS:  Parameters: [ <target> ] The USERS command returns a list of users logged into the server in a format similar to the UNIX commands who(1), rusers(1) and finger(1).\n"+
-  "WALLOPS:  Parameters: <Text to be sent> The WALLOPS command is used to send a message to all currently connected users who have set the ’w’ user mode for themselves.\n"+
-  "USERHOST:  Parameters: <nickname> *( SPACE <nickname> ) The USERHOST command takes a list of up to 5 nicknames, each separated by a space character and returns a list of information about each nickname that it found. \n"+
-  "ISON:  Parameters: <nickname> *( SPACE <nickname> ) The ISON command was implemented to provide a quick and efficient means to get a response about whether a given nickname was currently on IRC.\n"
+//  "REHASH:  Parameters: [None]. The rehash command is an administrative command which can be used by an operator to force the server to re-read and process its configuration file.\n"+
+//  "DIE:  Parameters: [None]. An operator can use the DIE command to shutdown the server.\n"+
+//  "RESTART:  Parameters: [None]. An operator can use the restart command to force the server to restart itself.\n"+
+//  "SUMMON:  Parameters: <user> [ <target> [ <channel> ] ] The SUMMON command can be used to give users who are on a host running an IRC server a message asking them to please join IRC.\n"+
+  "USERS:  Parameters: [ <target> ] The USERS command returns a list of users logged into the server in a format similar to the UNIX commands who(1), rusers(1) and finger(1).\n"
+//  "WALLOPS:  Parameters: <Text to be sent> The WALLOPS command is used to send a message to all currently connected users who have set the ’w’ user mode for themselves.\n"+
+//  "USERHOST:  Parameters: <nickname> *( SPACE <nickname> ) The USERHOST command takes a list of up to 5 nicknames, each separated by a space character and returns a list of information about each nickname that it found. \n"+
+//  "ISON:  Parameters: <nickname> *( SPACE <nickname> ) The ISON command was implemented to provide a quick and efficient means to get a response about whether a given nickname was currently on IRC.\n"
   );
 }
 
@@ -182,6 +179,8 @@ function quit(args, client, clients) {
     remove(client);
   }
 }
+
+// User is away from keyboard
 function away(args, client){
   var socket = client.socket;
   if(!args[1]){
@@ -196,6 +195,7 @@ function away(args, client){
   }
 }
 
+// User came back to keyboard
 function back(args, client){
   var socket = client.socket;
   if(args[1]){
@@ -208,6 +208,7 @@ function back(args, client){
   }
 }
 
+// Returns a list of information given by the client
 function who(args, client, clients){
   //query for all visible
   if(!args[1] || args[1] == 0){
@@ -307,6 +308,7 @@ function privmsg(args, client, clients, channels) {
     });
 }
 
+
 // Set the client's username
 function user(args,client, clients) {
 
@@ -374,35 +376,4 @@ function list(args, client, channels) {
 // Show the server's version
 function version(client) {
     client.socket.write("IRC Server "+ ver);
-}
-
-function mode(args, client) {
-    //TODO
-    socket.write("MODE command executed with sucess.\n");
-}
-
-function service(args, socket) {
-    //TODO
-    socket.write("JOIN command executed with sucess.\n");
-}
-
-function part(args, socket) {
-    //TODO
-    socket.write("PART command executed with sucess.\n");
-}
-
-function topic() {
-    //TODO
-    socket.write("TOPIC command executed with sucess.\n");
-}
-
-
-function invite() {
-    //TODO
-    socket.write("INTITE command executed with sucess.\n");
-}
-
-function kick() {
-    //TODO
-    socket.write("KICK command executed with sucess.\n");
 }
