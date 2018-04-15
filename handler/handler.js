@@ -51,7 +51,7 @@ var nickname = "Anonymous";
 exports.analyze = function (data, client, clients, channels) {
   var message = String(data).trim();
   var args = data.toString().trim().split(" ");
-  if (args[0] === COMMANDS.HELP) help(socket);
+  if (args[0] === COMMANDS.HELP) help(client);
   else if (args[0] === COMMANDS.NICK) nick(args, client.socket, clients);
   else if (args[0] === COMMANDS.PASS) pass(args, client.socket);
   else if (args[0] === COMMANDS.USER) user(args, client.socket, clients);
@@ -78,8 +78,8 @@ exports.analyze = function (data, client, clients, channels) {
 
 
 // List all commands available
-function help(socket){
-  socket.write("\nCommands of connection registration:\n"+
+function help(client){
+  client.socket.write("\nCommands of connection registration:\n"+
   "NICK: Parameters: <nickname>. To set your nickname.\n"+
   "PASS: Parameters: <password>. To set your password.\n"+
   "USER: Parameters: <user> <mode> <unused> <realname>. Used at the beginning of connection to specify the username.\n"+
@@ -124,7 +124,7 @@ function help(socket){
   "KILL: Parameters: <nickname> <comment> The KILL command is used to cause a client-server connection to be closed by the server which has the actual connection.\n"+
   "PING : Parameters: <server1> [ <server2> ] The PING command is used to test the presence of an active client or server at the other end of the connection. \n"+
   "PONG: Parameters: <server> [ <server2> ] PONG message is a reply to ping message.\n"+
-  " ERROR: Parameters: <error message> The ERROR command is for use by servers when reporting a serious or fatal error to its peers.\n"+
+  "ERROR: Parameters: <error message> The ERROR command is for use by servers when reporting a serious or fatal error to its peers.\n"+
   "AWAY: Parameters: [ <text> ] With the AWAY command, clients can set an automatic reply string for any PRIVMSG commands directed at them (not to a channel they are on).\n"+
   "REHASH:  Parameters: [None]. The rehash command is an administrative command which can be used by an operator to force the server to re-read and process its configuration file.\n"+
   "DIE:  Parameters: [None]. An operator can use the DIE command to shutdown the server.\n"+
@@ -263,17 +263,16 @@ function join(args, client, clients, nicks, channels) {
         return;
     } else {
         var channelName = args.slice(1);
-         boolean chan = false;
+        var chan = false;
         for (i = 0; i < channels.length; i++) {
             //checa se o canal existe
-			boolean chan = false;
             if (channels[i].name == channelName) {
 				chan = true;
-                var chn = channels[i];
-                client.channels.push(chn);
+                client.channels.push(channels[i]);
                 channels[i].members.push(client);
                 server.channels = channels;
                 client.socket.write("You joined " + chn.name + ".\n");
+                return;
             }
         }
 		if(chan=!true){
