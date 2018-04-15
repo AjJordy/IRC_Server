@@ -48,7 +48,7 @@ const COMMANDS = {
 exports.analyze = function (data, client, clients, channels) {
   var message = String(data).trim();
   var args = data.toString().trim().split(" ");
-  if (args[0] === COMMANDS.HELP) help(socket);
+  if (args[0] === COMMANDS.HELP) help(client);
   else if (args[0] === COMMANDS.NICK) nick(args, client, clients);
   else if (args[0] === COMMANDS.PASS) pass(args, client);
   else if (args[0] === COMMANDS.USER) user(args, client, clients);
