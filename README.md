@@ -28,7 +28,7 @@
 
 1. Use o comando PASS \<senha> para definir uma senha.
 2. Use o comando NICK \<apelido> para definir um apelido.
-3. Use o comando USER \<user> \<modo> \<nome real> para estabelecer uma conexão com o servidor.
+3. Use o comando USER \<user> \<modo> * : \<nome real> para estabelecer uma conexão com o servidor.
 4. Use o comando JOIN \<canal> para se juntar a um canal.
 5. Divirta-se.
 
