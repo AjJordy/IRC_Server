@@ -425,8 +425,9 @@ function invite() {
 function kick(args, client, clients, channels) {
     var socket = client.socket;
     var comando = args.join(" ");
-    var regexFindDestinatarios = new RegExp(COMMANDS.KICK + ' ([^\s]*) ([^\s]*)\s?:?(.*)');
+    var regexFindDestinatarios = new RegExp(COMMANDS.KICK + ' ([^\ ]*) ([^\ ^\:]*)[\ ]?[\:]?(.*)');
     var parametros = comando.match(regexFindDestinatarios);
+
     if (parametros === null || parametros[1] === '' || parametros[2] === '') {
         //ERR_NEEDMOREPARAMS
         socket.write("Incomplete Command");
@@ -445,7 +446,6 @@ function kick(args, client, clients, channels) {
     var channelsKick = channels.filter(function (channel) {
         return channelsKickNames.indexOf(channel.name) !== -1;
     });
-
     if (channelsKick.length === 0) {
         //ERR_NOSUCHCHANNEL
         socket.write("Channel not exists");
@@ -464,7 +464,6 @@ function kick(args, client, clients, channels) {
         return;
     }
     //TODO Verificar permissão do usuário para poder remover pessoa.
-    console.log('estou aqui '+ channelsKick.length);
     channelsKick.forEach(function (channelKick) {
         var clientsKick = channelKick.members.filter(function (clientChannel) {
             return nicknamesKick.indexOf(clientChannel.nick) !== -1;

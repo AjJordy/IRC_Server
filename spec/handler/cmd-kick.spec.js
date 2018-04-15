@@ -20,21 +20,24 @@ describe("Deve testar a kick", function () {
         var clienteAlvo = clientesDentroDoCanal[0];
         var clienteAtivo = clientesDentroDoCanal[1];
         var clientesDentroDoCanalForaAlvo = [].concat(clientesDentroDoCanal).splice(1);
+        var reason = faker.lorem.sentence();
 
-        var comando = 'KICK ' + canal.name + ' ' + clienteAlvo.nick;
+        var comando = 'KICK ' + canal.name + ' ' + clienteAlvo.nick + ':' + reason;
         var allClients = [].concat(clientesDentroDoCanal).concat(clientesForaDoCanal);
         var allChannels = [canal];
-        handler.analyze(comando, clienteAtivo, allClients, [allChannels]);
-
-        expect(0).toBe(canal.members.filter(function(member){
+        handler.analyze(comando, clienteAtivo, allClients, allChannels);
+        expect(0).toBe(canal.members.filter(function (member) {
             return member.nick === clienteAlvo.nick;
         }).length);
 
         var esperadoAlvo = messageClient.replace('[CHANNEL_NAME]', canal.name);
+        console.log(esperadoAlvo);
         expect(esperadoAlvo).toBe(clienteAlvo.socket.getRespostas()[0]);
 
         //Assinantes do canal menos alvo
-        var esperadoCanal = messageChannelWithoutReason.replace('[CLIENT_NAME]', clienteAlvo.nick);
+        var esperadoCanal = messageChannelWithReason.replace('[CLIENT_NAME]', clienteAlvo.nick);
+        esperadoCanal = esperadoCanal.replace('[REASON]', reason);
+        console.log(esperadoCanal);
         clientesDentroDoCanalForaAlvo.forEach(function (cliente) {
             expect(esperadoCanal).toBe(cliente.socket.getRespostas()[0]);
         });
@@ -44,6 +47,5 @@ describe("Deve testar a kick", function () {
             expect(0).toBe(cliente.socket.getRespostas().length);
         });
     });
-
 
 });
