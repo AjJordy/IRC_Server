@@ -26,10 +26,10 @@
 
 ### Passo a passo 
 
-1. Use o comando PASS <senha> para definir uma senha.
-2. Use o comando NICK <apelido> para definir um apelido.
-3. Use o comando USER <user> <modo> <nome real> para estabelecer uma conexão com o servidor.
-4. Use o comando JOIN <canal> para se juntar a um canal.
+1. Use o comando PASS /<senha> para definir uma senha.
+2. Use o comando NICK /<apelido> para definir um apelido.
+3. Use o comando USER /<user> /<modo> /<nome real> para estabelecer uma conexão com o servidor.
+4. Use o comando JOIN /<canal> para se juntar a um canal.
 5. Divirta-se.
 
 ### Funções suportadas 
@@ -61,7 +61,7 @@ Mais informações no link: *'https://tools.ietf.org/html/rfc2812'*
 
 Para executar o arquivo javascript é necessário baixar o nodejs.(Para isso rode o comando no linux: *'sudo apt-get install nodejs-legacy'*)
 
-Após isso basta rodar o comando *'node <arquivo.js>'*. 
+Após isso basta rodar o comando *'node /<arquivo.js>'*. 
 
 No caso específio de abrir o servidor IRC. É necessário usar *'node server.js'* do diretório *'~/p1g1/server/'*.
 
