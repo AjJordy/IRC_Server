@@ -1,6 +1,7 @@
 // Load the TCP Library
 net = require('net');
 server = require('../server/server.js');
+channelObject = require('../entity/entity_channel.js');
 
 passOp = "admin";
 ver = "1.0";
@@ -262,9 +263,12 @@ function join(args, client, clients, nicks, channels) {
         return;
     } else {
         var channelName = args.slice(1);
+         boolean chan = false;
         for (i = 0; i < channels.length; i++) {
             //checa se o canal existe
+			boolean chan = false;
             if (channels[i].name == channelName) {
+				chan = true;
                 var chn = channels[i];
                 client.channels.push(chn);
                 channels[i].members.push(client);
@@ -272,6 +276,10 @@ function join(args, client, clients, nicks, channels) {
                 client.socket.write("You joined " + chn.name + ".\n");
             }
         }
+		if(chan=!true){
+			channelObject = clientEntity.constructor(channelName);
+			channelObject.members.push(client);
+		}
     }
 }
 
