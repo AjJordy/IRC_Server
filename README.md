@@ -52,7 +52,6 @@
 * PRIVMSG
 * VERSION
 * WHO
-* BACK
 * AWAY
 
 Mais informações no link: *'https://tools.ietf.org/html/rfc2812'*
