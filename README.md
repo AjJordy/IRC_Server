@@ -65,6 +65,9 @@ Após isso basta rodar o comando *'node \<arquivo.js>'*.
 
 No caso específio de abrir o servidor IRC. É necessário usar *'node server.js'* do diretório *'~/p1g1/server/'*.
 
+# Diagrama de Classes
+
+![GitHub Logo](/p1-g1.png)
 
 ### Rodar Testes do servidor
 
