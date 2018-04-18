@@ -163,7 +163,7 @@ function quit(args, client, clients) {
     if (!args[1]) {
         // Remove usuario sem mostrar nenhuma mensagem
         handler.broadcast(client.nick + " quits\n", client, clients);
-        client.socket.end(); 
+        client.socket.end();
     } else {
         // Remove usuario exibindo mensagem escrita por ele
         args.splice(0, 1);
@@ -233,28 +233,49 @@ function join(args, client, clients, channels) {
         socket.write("ERROR: invalid request, try /join <#channel>\n");
         return;
     } else {
-        var channelName = [].concat(args).slice(1) + '';
-        var found = channels.find(function (channel) {
-            return channelName === channel.name;
-        });
-        //TODO verificar tamanho do canal, numero de canais do participante e o mode do usuário corretamente
-        if (found !== undefined) {
-            var clientChannel = client.channels.find(function (channel) {
-                return channelName === channel.name
-            });
-            if (clientChannel !== undefined) {
-                return;
-            }
-            found.members.push(client);
-            client.channels.push(found);
-        } else {
-            found = channelObject.constructor(channelName);
-            found.members.push(Object.assign({}, {isOp: true}, client));
-            client.channels.push(found);
-            channels.push(found);
+        var regexFindNamesAndPass = new RegExp(COMMANDS.JOIN + ' ([^\ ]*)[\ ]?([^\ ]*)');
+        var match = args.join(' ').match(regexFindNamesAndPass);
+        if (match == null || match[1] == null) {
+            socket.write("ERROR: invalid request, try /join <#channel>\n");
+            return;
         }
-        client.socket.write("You joined " + channelName + ".\n");
-        exports.broadcast(client.nick.toString() + " joined the chat", client, found.members);
+        var channelNames = match[1].split(',');
+        var passwords = match[2].split(',');
+
+        var i = 0;
+        channelNames.forEach(function (channelName) {
+            var found = channels.find(function (channel) {
+                return channelName === channel.name;
+            });
+            //TODO verificar tamanho do canal, numero de canais do participante e o mode do usuário corretamente
+            if (found !== undefined) {
+                if (found.key.length == 0 || found.key === passwords[i]) {
+                    var clientChannel = client.channels.find(function (channel) {
+                        return channelName === channel.name
+                    });
+                    if (clientChannel !== undefined) {
+                        return;
+                    }
+                    found.members.push(client);
+                    client.channels.push(found);
+                } else {
+                    //ERR_BADCHANNELKEY
+                    socket.write("ERR_BADCHANNELKEY");
+                    return;
+                }
+
+            } else {
+                //Add MODE
+                found = channelObject.constructor(channelName);
+                found.key = passwords[i];
+                found.members.push(Object.assign({}, {isOp: true}, client));
+                client.channels.push(found);
+                channels.push(found);
+            }
+            client.socket.write("You joined " + channelName + ".\n");
+            exports.broadcast(client.nick.toString() + " joined the chat", client, found.members);
+            i++;
+        });
     }
 }
 
@@ -281,13 +302,14 @@ function privmsg(args, client, clients, channels) {
                 writeMessage(clientDest, client, clientDest.awayMessage);
             }
         }
-        9
     });
 
     channels.forEach(function (channelDest) {
         if (destinatarios.indexOf(channelDest.name) !== -1) {
             channelDest.members.forEach(function (clientDest) {
-                writeMessage(client, clientDest, msg);
+                if (clientDest.nick + '' !== client.nick + '') {
+                    writeMessage(client, clientDest, msg);
+                }
             });
         }
     });

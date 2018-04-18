@@ -92,6 +92,9 @@ describe("Deve testar a mensagem privada", function () {
         var clienteAtivo = clientFactory.createClientWithNick();
         var channel = channelFactory.createChannelWithClients();
 
+        clienteAtivo.channels.push(channel);
+        channel.members.push(clienteAtivo);
+
         var channels = [];
         channels.push(channel);
 
@@ -107,7 +110,9 @@ describe("Deve testar a mensagem privada", function () {
 
         //Devem receber uma mensagem privada
         channel.members.forEach(function (cliente) {
-            expect(esperado).toBe(cliente.socket.getRespostas()[0]);
+            if (cliente.nick !== clienteAtivo.nick) {
+                expect(esperado).toBe(cliente.socket.getRespostas()[0]);
+            }
         });
 
         //Nenhum deles deve receber uma mensagem privada
