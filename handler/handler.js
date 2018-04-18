@@ -260,7 +260,7 @@ function join(args, client, clients, channels) {
                     client.channels.push(found);
                 } else {
                     //ERR_BADCHANNELKEY
-                    socket.write("ERR_BADCHANNELKEY");
+                    socket.write("ERR_BADCHANNELKEY\n");
                     return;
                 }
 
