@@ -260,7 +260,7 @@ function join(args, client, clients, channels) {
                     client.channels.push(found);
                 } else {
                     //ERR_BADCHANNELKEY
-                    socket.write("ERR_BADCHANNELKEY");
+                    socket.write("ERR_BADCHANNELKEY\n");
                     return;
                 }
 
@@ -370,8 +370,8 @@ function mode(args, client, clients, channels) {
     }
     else {
       client.socket.write("Unknow flag\n");
-    return;
-  }
+      return;
+    }
 
 
     if (args.length < 2) {
