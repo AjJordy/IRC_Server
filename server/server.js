@@ -29,8 +29,11 @@ net.createServer(function (socket) {
 
   // Handle incoming messages from clients.
   socket.on('data', function (data) {
-		handler.analyze(data, curr_Client, clients, channels);
-		console.log(data.toString().trim());
+      data.toString().trim().split('\n').forEach((function(comando){
+          handler.analyze(comando, curr_Client, clients, channels);
+          console.log(comando);
+      }));
+
 	});
 
   // Remove the client from the list when it leaves

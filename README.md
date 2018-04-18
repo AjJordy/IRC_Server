@@ -53,6 +53,7 @@
 * VERSION
 * WHO
 * AWAY
+* PING
 
 Mais informações no link: *'https://tools.ietf.org/html/rfc2812'*
 
