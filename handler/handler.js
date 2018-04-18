@@ -39,12 +39,12 @@ const COMMANDS = {
     PRIVMSG: 'PRIVMSG',
     VERSION: 'VERSION',
     WHO: 'WHO',
-    AWAY: 'AWAY'
+    AWAY: 'AWAY',
+    PING: 'PING'
 };
 
-exports.analyze = function (data, client, clients, channels) {
-    var message = String(data).trim();
-    var args = data.toString().trim().split(" ");
+exports.analyze = function (message, client, clients, channels) {
+    var args = message.split(" ");
     if (args[0] === COMMANDS.HELP) help(client);
     else if (args[0] === COMMANDS.NICK) nick(args, client, clients);
     else if (args[0] === COMMANDS.PASS) pass(args, client);
@@ -59,11 +59,12 @@ exports.analyze = function (data, client, clients, channels) {
     else if (args[0] === COMMANDS.PART) part(args, client);
     else if (args[0] === COMMANDS.TOPIC) topic(args, client);
     else if (args[0] === COMMANDS.NAMES) names(args, client, channels);
-    else if (args[0] === COMMANDS.LIST) list(args, client);
+    else if (args[0] === COMMANDS.LIST) list(args, client, channels);
     else if (args[0] === COMMANDS.INVITE) invite(args, client);
     else if (args[0] === COMMANDS.KICK) kick(args, client, clients, channels);
     else if (args[0] === COMMANDS.PRIVMSG) privmsg(args, client, clients, channels);
     else if (args[0] === COMMANDS.VERSION) version(client);
+    else if (args[0] === COMMANDS.PING) ping(client);
     else client.socket.write("Command doesn't exist.\n");//handler.broadcast(data.toString().trim(), client, clients);
 };
 
@@ -113,7 +114,7 @@ function help(client) {
 //  "WHOIS: Parameters: [ <target> ] <mask> *( \",\" <mask> ) This command is used to query information about particular user.\n"+
 //  "WHOWAS: Parameters: <nickname> *( \",\" <nickname> ) [ <count> [ <target> ] ]. Whowas asks for information about a nickname which no longer exists.\n"+
 //  "KILL: Parameters: <nickname> <comment> The KILL command is used to cause a client-server connection to be closed by the server which has the actual connection.\n"+
-//  "PING : Parameters: <server1> [ <server2> ] The PING command is used to test the presence of an active client or server at the other end of the connection. \n"+
+        "PING : Parameters: <server1> [ <server2> ] The PING command is used to test the presence of an active client or server at the other end of the connection. \n" +
 //  "PONG: Parameters: <server> [ <server2> ] PONG message is a reply to ping message.\n"+
 //  " ERROR: Parameters: <error message> The ERROR command is for use by servers when reporting a serious or fatal error to its peers.\n"+
         "AWAY: Parameters: [ <text> ] With the AWAY command, clients can set an automatic reply string for any PRIVMSG commands directed at them (not to a channel they are on).\n" +
@@ -251,7 +252,7 @@ function join(args, client, clients, channels) {
             found = channelObject.constructor(channelName);
             found.members.push(Object.assign({}, {isOp: true}, client));
             client.channels.push(found);
-          channels.push(found);
+            channels.push(found);
         }
         client.socket.write("You joined " + channelName + ".\n");
         exports.broadcast(client.nick.toString() + " joined the chat", client, found.members);
@@ -281,6 +282,7 @@ function privmsg(args, client, clients, channels) {
                 writeMessage(clientDest, client, clientDest.awayMessage);
             }
         }
+        9
     });
 
     channels.forEach(function (channelDest) {
@@ -338,138 +340,138 @@ function oper(args, client) {
 function mode(args, client, clients, channels) {
     //TODO
     if (args.length < 3) {
-          client.socket.write("Need more params \n");
-          return;
-        }
+        client.socket.write("Need more params \n");
+        return;
+    }
     else {
-          var channelIndex = channels.findIndex(i.name === args[1]);
+        var channelIndex = channels.findIndex(i.name === args[1]);
 
-          if(channelIndex == -1) {
-                  client.socket.write("No such channel\n");
-                  return;
-                }
-          else {
-                  if (args[2][0] == "+") {
-                            var flag = true;
-                          }
-                  else if(args[2][0] == "-") {
-                            var flag = false;
-                          }
-                  else {
-                            client.socket.write("Unknow flag\n");
-                            return;
-                          }
-
-                  if(args[2].length() == 2 & flag) {
-                            if(args[2][1] == 'l') {
-                                          channels[channelIndex].limit = +args[3];
-
-                                        client.socket.write("Channel limit updated to " + args[3] + "\n");
-                                        return;
-                                      }
-                          }
-
-                  if(args[2].indexOf('o') != -1) {
-                                        if(flag && (channels[channelIndex].operators.indexOf(client.nick) == -1))
-                                          channels[channelIndex].operators.push(client.nick);
-                                        else {
-                                                    var clientIndex = channels[channelIndex].operators.findIndex(n === client.nick);
-                                                    if(clientIndex > 0)
-                                                                    channels[channelIndex].operators.splice(clientIndex, 1);
-                                                  }
-
-                            client.socket.write("MODE command executed\n");
-                            return;
-                          }
-
-                  if(args[2].indexOf('p') != -1) {
-                            if(flag)
-                                        channels[channelIndex].private = true;
-                            else
-                                        channels[channelIndex].private = false;
-                          }
-
-                  if(args[2].indexOf('s') != -1) {
-                            if(flag)
-                                        channels[channelIndex].secret = true;
-                            else
-                                        channels[channelIndex].secret = false;
-                          }
-
-                  if(args[2].indexOf('i') != -1) {
-                            if(flag)
-                                        channels[channelIndex].inviteOnly = true;
-                            else
-                                        channels[channelIndex].inviteOnly = false;
-                          }
-
-                  if(args[2].indexOf('t') != -1) {
-                            if(flag)
-                                        channels[channelIndex].topicOnlyOp = true;
-                            else
-                                        channels[channelIndex].topicOnlyOp = false;
-                          }
-
-                  if(args[2].indexOf('n') != -1) {
-                            if(flag)
-                                        channels[channelIndex].outside = true;
-                            else
-                                        channels[channelIndex].outside = false;
-                          }
-
-                  if(args[2].indexOf('m') != -1) {
-                            if(flag)
-                                        channels[channelIndex].moderated = true;
-                            else
-                                        channels[channelIndex].moderated = false;
-                          }
-
-                  if(args[2].indexOf('v') != -1) {
-                            if(flag && (channels[channelIndex].voice.indexOf(args[3]) == -1))
-                                        channels[channelIndex].voice.push(args[3]);
-                            else {
-                                        var clientIndex = channels[channelIndex].voice.findIndex(n === args[3]);
-                                        if(clientIndex > 0)
-                                                      channels[channelIndex].voice.splice(clientIndex, 1);
-                                      }
-
-                            client.socket.write("MODE command executed\n");
-                            return;
-                          }
-
-                  if(args[2].indexOf('b') != -1) {
-                            if(args.length < 4)
-                                        client.socket.write("Current ban masks: " + channels[channelIndex].banMask + " \n");
-                            else {
-                                        if(flag)
-                                                      channels[channelIndex].banMask = args[3];
-                                        else
-                                                      channels[channelIndex].banMask = "";
-                                      }
-
-                            client.socket.write("MODE command executed\n");
-                            return;
-                          }
-
-                  if(args[2].indexOf('k') != -1) {
-                            if(flag) {
-                                        if(args.length < 4) {
-                                                      client.socket.write("Need more params\n");
-                                                      return;
-                                                    }
-                                        else {
-                                                      channels[channelIndex].key = args[3];
-                                                      client.socket.write("Channel password updated!\n");
-                                                    }
-                                      }
-                            else
-                                        channels[channelIndex].key = "";
-
-                            client.socket.write("MODE command executed\n");
-                          }
-                }
+        if (channelIndex == -1) {
+            client.socket.write("No such channel\n");
+            return;
         }
-  }
+        else {
+            if (args[2][0] == "+") {
+                var flag = true;
+            }
+            else if (args[2][0] == "-") {
+                var flag = false;
+            }
+            else {
+                client.socket.write("Unknow flag\n");
+                return;
+            }
+
+            if (args[2].length() == 2 & flag) {
+                if (args[2][1] == 'l') {
+                    channels[channelIndex].limit = +args[3];
+
+                    client.socket.write("Channel limit updated to " + args[3] + "\n");
+                    return;
+                }
+            }
+
+            if (args[2].indexOf('o') != -1) {
+                if (flag && (channels[channelIndex].operators.indexOf(client.nick) == -1))
+                    channels[channelIndex].operators.push(client.nick);
+                else {
+                    var clientIndex = channels[channelIndex].operators.findIndex(n === client.nick);
+                    if (clientIndex > 0)
+                        channels[channelIndex].operators.splice(clientIndex, 1);
+                }
+
+                client.socket.write("MODE command executed\n");
+                return;
+            }
+
+            if (args[2].indexOf('p') != -1) {
+                if (flag)
+                    channels[channelIndex].private = true;
+                else
+                    channels[channelIndex].private = false;
+            }
+
+            if (args[2].indexOf('s') != -1) {
+                if (flag)
+                    channels[channelIndex].secret = true;
+                else
+                    channels[channelIndex].secret = false;
+            }
+
+            if (args[2].indexOf('i') != -1) {
+                if (flag)
+                    channels[channelIndex].inviteOnly = true;
+                else
+                    channels[channelIndex].inviteOnly = false;
+            }
+
+            if (args[2].indexOf('t') != -1) {
+                if (flag)
+                    channels[channelIndex].topicOnlyOp = true;
+                else
+                    channels[channelIndex].topicOnlyOp = false;
+            }
+
+            if (args[2].indexOf('n') != -1) {
+                if (flag)
+                    channels[channelIndex].outside = true;
+                else
+                    channels[channelIndex].outside = false;
+            }
+
+            if (args[2].indexOf('m') != -1) {
+                if (flag)
+                    channels[channelIndex].moderated = true;
+                else
+                    channels[channelIndex].moderated = false;
+            }
+
+            if (args[2].indexOf('v') != -1) {
+                if (flag && (channels[channelIndex].voice.indexOf(args[3]) == -1))
+                    channels[channelIndex].voice.push(args[3]);
+                else {
+                    var clientIndex = channels[channelIndex].voice.findIndex(n === args[3]);
+                    if (clientIndex > 0)
+                        channels[channelIndex].voice.splice(clientIndex, 1);
+                }
+
+                client.socket.write("MODE command executed\n");
+                return;
+            }
+
+            if (args[2].indexOf('b') != -1) {
+                if (args.length < 4)
+                    client.socket.write("Current ban masks: " + channels[channelIndex].banMask + " \n");
+                else {
+                    if (flag)
+                        channels[channelIndex].banMask = args[3];
+                    else
+                        channels[channelIndex].banMask = "";
+                }
+
+                client.socket.write("MODE command executed\n");
+                return;
+            }
+
+            if (args[2].indexOf('k') != -1) {
+                if (flag) {
+                    if (args.length < 4) {
+                        client.socket.write("Need more params\n");
+                        return;
+                    }
+                    else {
+                        channels[channelIndex].key = args[3];
+                        client.socket.write("Channel password updated!\n");
+                    }
+                }
+                else
+                    channels[channelIndex].key = "";
+
+                client.socket.write("MODE command executed\n");
+            }
+        }
+    }
+}
 
 
 // List the user's name of the channel
@@ -497,6 +499,10 @@ function list(args, client, channels) {
 // Show the server's version
 function version(client) {
     client.socket.write("IRC Server " + ver + "\n");
+}
+
+function ping(client) {
+    client.socket.write("PONG");
 }
 
 function kick(args, client, clients, channels) {
