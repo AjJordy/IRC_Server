@@ -160,7 +160,6 @@ function pass(args, client) {
 
 // Client quit from the server
 function quit(args, client, clients) {
-    var socket = client.socket;
     if (!args[1]) {
         // Remove usuario sem mostrar nenhuma mensagem
         handler.broadcast(client.nick + " quits\n", client, clients);
