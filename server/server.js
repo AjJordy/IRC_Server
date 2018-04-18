@@ -39,11 +39,10 @@ net.createServer(function (socket) {
   // Remove the client from the list when it leaves
   socket.on('end', function () {
     clients.splice(clients.indexOf(curr_Client.socket), 1);
-    handler.broadcast(curr_Client.nick + " left the chat.\n", curr_Client, clients);
   });
 
 
-}).listen(5000);
+}).listen(8081);
 
 exports.clients = clients;
 
