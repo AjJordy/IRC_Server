@@ -27,14 +27,10 @@ const COMMANDS = {
     USER: 'USER',
     OPER: 'OPER',
     MODE: 'MODE',
-    SERVICE: 'SERVICE',
     QUIT: 'QUIT',
     JOIN: 'JOIN',
-    PART: 'PART',
-    TOPIC: 'TOPIC',
     NAMES: 'NAMES',
     LIST: 'LIST',
-    INVITE: 'INVITE',
     KICK: 'KICK',
     PRIVMSG: 'PRIVMSG',
     VERSION: 'VERSION',
@@ -53,14 +49,10 @@ exports.analyze = function (message, client, clients, channels) {
     else if (args[0] === COMMANDS.WHO) who(args, client, clients);
     else if (args[0] === COMMANDS.OPER) oper(args, client);
     else if (args[0] === COMMANDS.MODE || args[0] == client.nick) mode(args, client, clients, channels);
-    else if (args[0] === COMMANDS.SERVICE) service(args, client);
     else if (args[0] === COMMANDS.QUIT) quit(args, client, clients);
     else if (args[0] === COMMANDS.JOIN) join(args, client, clients, channels);
-    else if (args[0] === COMMANDS.PART) part(args, client);
-    else if (args[0] === COMMANDS.TOPIC) topic(args, client);
     else if (args[0] === COMMANDS.NAMES) names(args, client, channels);
     else if (args[0] === COMMANDS.LIST) list(args, client, channels);
-    else if (args[0] === COMMANDS.INVITE) invite(args, client);
     else if (args[0] === COMMANDS.KICK) kick(args, client, clients, channels);
     else if (args[0] === COMMANDS.PRIVMSG) privmsg(args, client, clients, channels);
     else if (args[0] === COMMANDS.VERSION) version(client);
