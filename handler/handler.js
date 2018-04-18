@@ -349,8 +349,8 @@ function mode(args, client, clients, channels) {
     }
     else {
       client.socket.write("Unknow flag\n");
-    return;
-  }
+      return;
+    }
 
 
     if (args.length < 2) {
