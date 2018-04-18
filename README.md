@@ -40,20 +40,23 @@
 * USER
 * OPER
 * MODE
-* SERVICE
 * QUIT
 * JOIN
-* PART
-* TOPIC
 * NAMES
 * LIST
-* INVITE
 * KICK
 * PRIVMSG
 * VERSION
 * WHO
 * AWAY
 * PING
+
+### Funções em Desenvolvimento
+
+* SERVICE
+* PART
+* TOPIC
+* INVITE
 
 Mais informações no link: *'https://tools.ietf.org/html/rfc2812'*
 
