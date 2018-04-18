@@ -52,9 +52,9 @@ exports.analyze = function (data, client, clients, channels) {
     else if (args[0] === COMMANDS.AWAY) away(args, client);
     else if (args[0] === COMMANDS.WHO) who(args, client, clients);
     else if (args[0] === COMMANDS.OPER) oper(args, client);
-    else if (args[0] === COMMANDS.MODE) mode(args, client);
+    else if (args[0] === COMMANDS.MODE) mode(args, client, channels);
     else if (args[0] === COMMANDS.SERVICE) service(args, client);
-    else if (args[0] === COMMANDS.QUIT) quit(args, client);
+    else if (args[0] === COMMANDS.QUIT) quit(args, client, clients);
     else if (args[0] === COMMANDS.JOIN) join(args, client, clients, channels);
     else if (args[0] === COMMANDS.PART) part(args, client);
     else if (args[0] === COMMANDS.TOPIC) topic(args, client);
@@ -162,16 +162,14 @@ function quit(args, client, clients) {
     var socket = client.socket;
     if (!args[1]) {
         // Remove usuario sem mostrar nenhuma mensagem
-        if (handler.broadcast(client.nick + " quits\n", client));
-        socket.end();
-        remove(client);
+        handler.broadcast(client.nick + " quits\n", client, clients);
+        client.socket.end(); 
     } else {
         // Remove usuario exibindo mensagem escrita por ele
         args.splice(0, 1);
         var mesg = args.join(" ");
         handler.broadcast(client.nick + " quits: " + mesg + "\n", client, clients);
-        socket.end();
-        remove(client);
+        client.socket.end();
     }
 }
 
@@ -226,14 +224,6 @@ function who(args, client, clients) {
         socket.write("ERROR: invalid request, try /who <mask or 0>\n");
         return;
     }
-}
-
-
-// Remove the client from the server
-function remove(client) {
-    delete server.nicks[client.nick];
-    var index = server.clients.indexOf(client);
-    server.clients.splice(index, 1);
 }
 
 // Client enter in a channel
